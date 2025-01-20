@@ -4,7 +4,7 @@ import debounce from 'lodash.debounce';
 import { fromJS } from 'immutable';
 
 import { mapboxAccessToken } from '../config/constants';
-import { importChangesetMap } from '../utils/cmap';
+// import { importChangesetMap } from '../utils/cmap';
 
 export class BBoxPicker extends React.Component {
   update = debounce(() => {
@@ -14,8 +14,7 @@ export class BBoxPicker extends React.Component {
       getWest: () => number,
       getNorth: () => number,
       getEast: () => number
-    } =
-      this.map && this.map.getBounds(); // ne, sw / lat, lng
+    } = this.map && this.map.getBounds(); // ne, sw / lat, lng
 
     let s = bounds.getSouth().toFixed(4);
     let w = bounds.getWest().toFixed(4);
@@ -35,23 +34,23 @@ export class BBoxPicker extends React.Component {
 
   map = null;
   componentDidMount() {
-    importChangesetMap('getGL').then((getGL: any) => {
-      if (getGL) {
-        var mapboxgl = getGL();
-        mapboxgl.accessToken = mapboxAccessToken;
-        if (this.props.value) {
-          // let bbox = this.props.value.getIn(['0', 'value'], '').split(',');
-        }
-        const map = new mapboxgl.Map({
-          container: 'map',
-          style: 'mapbox://styles/mapbox/light-v9'
-        });
-        map.on('dragend', this.update);
-        map.on('zoomend', this.update);
-        map.on('touchend', this.update);
-        this.map = map;
-      }
-    });
+    // importChangesetMap('getGL').then((getGL: any) => {
+    //   if (getGL) {
+    //     var mapboxgl = getGL();
+    //     mapboxgl.accessToken = mapboxAccessToken;
+    //     if (this.props.value) {
+    //       // let bbox = this.props.value.getIn(['0', 'value'], '').split(',');
+    //     }
+    //     const map = new mapboxgl.Map({
+    //       container: 'map',
+    //       style: 'mapbox://styles/mapbox/light-v9'
+    //     });
+    //     map.on('dragend', this.update);
+    //     map.on('zoomend', this.update);
+    //     map.on('touchend', this.update);
+    //     this.map = map;
+    //   }
+    // });
   }
   componentWillUnmount() {
     this.map && this.map.remove();

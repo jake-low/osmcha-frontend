@@ -80,8 +80,8 @@ class Changeset extends React.PureComponent {
   };
   render() {
     return (
-      <div>
-        <div className="flex-parent flex-parent--column clip">
+      <div className="absolute" style={{ top: 0, left: 0 }}>
+        <div className="absolute flex-parent flex-parent--column clip">
           {this.showChangeset()}
         </div>
       </div>

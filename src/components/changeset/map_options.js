@@ -2,7 +2,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { importChangesetMap } from '../../utils/cmap';
+// import { importChangesetMap } from '../../utils/cmap';
 import { updateStyle } from '../../store/map_controls_actions';
 import { Dropdown } from '../dropdown';
 
@@ -44,27 +44,27 @@ class MapOptions extends React.PureComponent {
     }
   };
   onChange = () => {
-    importChangesetMap('getMapInstance').then(
-      r => r && r() && r().filterLayers()
-    );
+    // importChangesetMap('getMapInstance').then(
+    //   r => r && r() && r().filterLayers()
+    // );
   };
   toggleSatellite = () => {
-    importChangesetMap('getMapInstance').then(
-      r =>
-        r &&
-        r() &&
-        r().renderMap('mapbox://styles/openstreetmap/cjnd8lj0e10i42spfo4nsvoay')
-    );
+    // importChangesetMap('getMapInstance').then(
+    //   r =>
+    //     r &&
+    //     r() &&
+    //     r().renderMap('mapbox://styles/openstreetmap/cjnd8lj0e10i42spfo4nsvoay')
+    // );
   };
   toggleDark = () => {
-    importChangesetMap('getMapInstance').then(
-      r => r && r() && r().renderMap('mapbox://styles/mapbox/dark-v9')
-    );
+    // importChangesetMap('getMapInstance').then(
+    //   r => r && r() && r().renderMap('mapbox://styles/mapbox/dark-v9')
+    // );
   };
   toggleStreet = () => {
-    importChangesetMap('getMapInstance').then(
-      r => r && r() && r().renderMap('mapbox://styles/mapbox/streets-v9')
-    );
+    // importChangesetMap('getMapInstance').then(
+    //   r => r && r() && r().renderMap('mapbox://styles/mapbox/streets-v9')
+    // );
   };
   toggleBing = () => {
     const bingStyle = {
@@ -92,9 +92,9 @@ class MapOptions extends React.PureComponent {
         }
       ]
     };
-    importChangesetMap('getMapInstance').then(
-      r => r && r() && r().renderMap(bingStyle)
-    );
+    // importChangesetMap('getMapInstance').then(
+    //   r => r && r() && r().renderMap(bingStyle)
+    // );
   };
   toggleOsm = () => {
     const osmStyle = {
@@ -122,9 +122,9 @@ class MapOptions extends React.PureComponent {
         }
       ]
     };
-    importChangesetMap('getMapInstance').then(
-      r => r && r() && r().renderMap(osmStyle)
-    );
+    // importChangesetMap('getMapInstance').then(
+    //   r => r && r() && r().renderMap(osmStyle)
+    // );
   };
   render() {
     return (

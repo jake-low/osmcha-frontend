@@ -1,196 +1,181 @@
 import React from 'react';
-import debounce from 'lodash.debounce';
 import { connect } from 'react-redux';
-import CSSTransitionGroup from 'react-transition-group/CSSTransitionGroup';
+import maplibre from 'maplibre-gl';
+import 'maplibre-gl/dist/maplibre-gl.css';
+import adiffParser from '@osmcha/osm-adiff-parser';
+import { MapLibreAugmentedDiffViewer } from '@osmcha/maplibre-adiff-viewer';
+
 import { Loading } from '../components/loading';
 import { SignIn } from '../components/sign_in';
-import { dispatchEvent } from '../utils/dispatch_event';
+import ElementInfo from '../components/element_info';
+import { fetchAndParseAugmentedDiff } from '../network/changeset';
 import { updateStyle } from '../store/map_controls_actions';
-import { importChangesetMap } from '../utils/cmap';
-import {
-  mapboxAccessToken,
-  osmUrl,
-  isOfficialOSM,
-  enableRealChangesets
-} from '../config/constants';
-
-import 'changeset-map/public/css/style.css';
+import { modal } from '../store/modal_actions';
 import type { RootStateType } from '../store';
-import { isMobile } from '../utils';
 
-let changesetId;
-let currentChangesetMap;
-let width = 700;
-let height = 500;
 let event;
-let cMapRender;
 
-let getMapInstance;
 export function selectFeature(id: number) {
   if (!id || !event) return;
   event.emit('selectFeature', 'node|way', id);
 }
 
-function loadingChangesetMapAsync() {
-  if (cMapRender) return Promise.resolve(cMapRender);
-  return Promise.all([
-    importChangesetMap('render'),
-    importChangesetMap('getMapInstance')
-  ]).then(res => {
-    cMapRender = res[0];
-    getMapInstance = res[1];
-    return cMapRender;
-  });
+async function loadDiffViewer(onClick) {
+  let changesetId = window.location.pathname.split('/').slice(-1)[0];
+  let adiff = await fetchAndParseAugmentedDiff(changesetId);
+  // let res = await fetch(`https://adiffs.osmcha.org/changesets/${changesetId}.adiff`);
+  // if (res.status !== 200) {
+  //   throw new Error(`GET /changesets/${changesetId}.adiff returned ${res.status} ${res.statusText}`);
+  // }
+  // let xml = await res.text();
+  // let adiff = await adiffParser(xml);
+  return new MapLibreAugmentedDiffViewer(adiff.actions, { onClick });
 }
-
-function loadMap() {
-  var container = document.getElementById('container');
-  if (!container || !currentChangesetMap) return;
-  loadingChangesetMapAsync().then(render => {
-    if (!render) return;
-    // if (event) event.emit('clearFeature');
-    event = render(container, changesetId, {
-      width: width + 'px',
-      height: Math.max(400, height) + 'px',
-      data: currentChangesetMap,
-      disableSidebar: true,
-      enableRealChangesets: enableRealChangesets,
-      mapboxAccessToken: mapboxAccessToken,
-      osmBase: osmUrl,
-      isOSMApp: isOfficialOSM
-    });
-  });
-}
-
-var minDebounce = debounce(loadMap, 250);
 
 class CMap extends React.PureComponent {
   props: {
     changesetId: number,
-    currentChangesetMap: Object,
-    errorChangesetMap: ?Object,
-    loadingChangesetMap: boolean,
     className: string,
     style: string
   };
 
   state = {
-    visible: false,
-    height: 0,
-    width: 0
+    loading: true,
+    selected: null
   };
 
-  ref = null;
+  map = null;
 
   componentDidMount() {
-    changesetId = this.props.changesetId;
-    currentChangesetMap = this.props.currentChangesetMap;
-    const mobile = isMobile();
-
-    if (this.ref) {
-      var rect = this.ref.parentNode.getBoundingClientRect();
-      // On mobile, above the map are two bars, one 36px, on 40px
-      height = mobile
-        ? parseInt(window.innerHeight - 36 - 40, 10)
-        : parseInt(window.innerHeight - 1 * 55, 10);
-      width = parseInt(rect.width, 10);
-    }
-    window.onresize = debounce(this.setDimensions, 100);
-    minDebounce();
+    this.initializeMap();
   }
 
   componentWillUnmount() {
-    window.onresize = null;
-    if (this.props.style !== 'satellite') this.props.updateStyle('satellite');
     event && event.emit('remove');
   }
 
-  componentDidUpdate(prevProp: Object) {
+  componentDidUpdate(prevProps: Object) {
     if (
-      this.props.currentChangesetMap !== prevProp.currentChangesetMap ||
-      this.props.token !== prevProp.token
+      this.props.token !== prevProps.token ||
+      this.props.changesetId !== prevProps.changesetId
     ) {
-      minDebounce();
+      this.setState({ selected: null });
+      this.initializeMap();
     }
   }
 
-  setRef = (r: any) => {
-    this.ref = r;
-    this.setDimensions();
-  };
+  initializeMap() {
+    let container = document.getElementById('container');
 
-  setDimensions = () => {
-    if (!this.ref) return;
-    var rect = this.ref.parentNode.getBoundingClientRect();
-    height = parseInt(window.innerHeight - 1 * 55, 10);
-    width = parseInt(rect.width, 10);
-    this.setState({
-      height,
-      width
-    });
-    if (getMapInstance) {
-      var instance = getMapInstance();
-      if (instance && instance.map) {
-        instance.map.resize();
-      }
+    if (this.map) {
+      this.map.remove();
     }
+
+    let map = new maplibre.Map({
+      container,
+      // style: 'https://api.maptiler.com/maps/satellite/style.json?key=hAHwpkEzPARYSwpwQ1gi',
+      style: {
+        version: 8,
+        sources: {
+          bing: {
+            type: 'raster',
+            tiles: [
+              'https://ecn.t0.tiles.virtualearth.net/tiles/a{quadkey}.jpeg?g=587&mkt=en-gb&n=z',
+              'https://ecn.t1.tiles.virtualearth.net/tiles/a{quadkey}.jpeg?g=587&mkt=en-gb&n=z',
+              'https://ecn.t2.tiles.virtualearth.net/tiles/a{quadkey}.jpeg?g=587&mkt=en-gb&n=z',
+              'https://ecn.t3.tiles.virtualearth.net/tiles/a{quadkey}.jpeg?g=587&mkt=en-gb&n=z'
+            ],
+            tileSize: 256,
+            maxzoom: 20,
+            attribution:
+              'Map data from <a href=https://openstreetmap.org/copyright>OpenStreetMap</a> | Imagery © Microsoft Corporation'
+          }
+        },
+        layers: [
+          {
+            id: 'imagery',
+            type: 'raster',
+            source: 'bing'
+          }
+        ]
+      },
+      maxZoom: 22,
+      hash: false,
+      attributionControl: false // we're moving this to the other corner
+    });
+
+    map.addControl(new maplibre.AttributionControl(), 'bottom-left');
+
+    map.setMaxPitch(0);
+    map.dragRotate.disable();
+    map.touchZoomRotate.disableRotation();
+    map.keyboard.disableRotation();
+
+    // start loading the diff viewer (and the required diff file) here, rather
+    // than after the 'load' event fires, to reduce total load time
+    let adiffViewerPromise = loadDiffViewer(this.handleClick)
+      .catch(error => {
+        this.props.modal({
+          type: 'error',
+          title: 'Error loading changeset map',
+          description: error.message
+        });
+      })
+      .finally(() => this.setState({ loading: false }));
+
+    map.on('load', async () => {
+      let adiffViewer = await adiffViewerPromise;
+      if (adiffViewer) {
+        adiffViewer.addTo(map);
+        map.jumpTo(map.cameraForBounds(adiffViewer.bounds(), { padding: 50 }));
+      }
+    });
+
+    this.map = map;
+  }
+
+  handleClick = (event, action) => {
+    console.log('handleClick()', action);
+    this.setState({ selected: action });
   };
 
   render() {
-    if (this.props.errorChangesetMap) {
-      dispatchEvent('showToast', {
-        title: 'changeset-map failed to load',
-        content: 'Try reloading osmcha',
-        timeOut: 5000,
-        type: 'error'
-      });
-      console.error(this.props.errorChangesetMap);
-      // return null;
-    }
-    changesetId = this.props.changesetId;
-    currentChangesetMap = this.props.currentChangesetMap;
-
+    console.log(`CMap render with changesetId = ${this.props.changesetId}`);
     if (this.props.token) {
       return (
-        <div className="relative" ref={this.setRef}>
-          <div
-            id="container"
-            className="absolute"
-            style={{
-              height: this.state.height,
-              width: this.state.width,
-              visibility: !(
-                this.props.loadingChangesetMap || this.props.errorChangesetMap
-              )
-                ? 'visible'
-                : 'hidden'
-            }}
-          />
-          <CSSTransitionGroup
-            transitionName="map-hide"
-            transitionAppearTimeout={300}
-            transitionAppear={true}
-            transitionEnterTimeout={300}
-            transitionLeaveTimeout={1000} // determines the transition to cMap
-          >
-            {(this.props.loadingChangesetMap ||
-              this.props.errorChangesetMap) && (
-              <div
-                key={0}
-                id="placeholder"
-                className={`absolute z0
-                  ${this.props.errorChangesetMap ? 'bg-red-faint' : 'bg-black'}
-                  `}
-                style={{
-                  height: this.state.height,
-                  width: this.state.width
-                }}
-              >
-                <Loading height={this.state.height} />
-              </div>
-            )}
-          </CSSTransitionGroup>
-        </div>
+        <React.Fragment>
+          <div id="container" className="w-full h-full" />
+          {this.state.selected && (
+            <div
+              className="absolute bg-white px12 py6 z5 round"
+              style={{
+                bottom: 0,
+                right: 0,
+                margin: '10px',
+                minWidth: '400px',
+                maxWidth: '550px',
+                maxHeight: '60vh',
+                overflowY: 'scroll'
+              }}
+            >
+              <ElementInfo action={this.state.selected} />
+            </div>
+          )}
+          {this.state.loading && (
+            <div
+              className="absolute z0"
+              style={{
+                top: 0,
+                right: 0,
+                bottom: 0,
+                left: 0,
+                background: 'rgba(0, 0, 0, 0.5)'
+              }}
+            >
+              <Loading height="100%" />
+            </div>
+          )}
+        </React.Fragment>
       );
     } else {
       return <SignIn />;
@@ -201,16 +186,10 @@ class CMap extends React.PureComponent {
 CMap = connect(
   (state: RootStateType, props) => ({
     changesetId: state.changeset.get('changesetId'),
-    currentChangesetMap: state.changeset.getIn([
-      'changesetMap',
-      state.changeset.get('changesetId')
-    ]),
-    errorChangesetMap: state.changeset.get('errorChangesetMap'),
-    loadingChangesetMap: state.changeset.get('loadingChangesetMap'),
     style: state.mapControls.get('style'),
     token: state.auth.get('token')
   }),
-  { updateStyle }
+  { updateStyle, modal }
 )(CMap);
 
 export { CMap };

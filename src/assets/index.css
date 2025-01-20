@@ -502,3 +502,95 @@ img {
 .txt-underline-dotted {
   text-decoration: underline dotted !important;
 }
+
+table {
+  width: 100%;
+}
+
+th {
+  text-align: left;
+}
+
+.element-info hr {
+  border-bottom: 1px solid #ddd;
+  margin: 1em 0;
+}
+
+.element-info menu {
+  display: flex;
+  gap: 0.5em;
+  margin: 0.25em 0;
+}
+
+.tag-table, .metadata-table {
+  font-family: monospace;
+  line-height: 1.1;
+  white-space: pre-wrap;
+}
+
+.metadata-table th, .metadata-table td {
+  padding: 0 1ch;
+}
+
+.metadata-table th:first-child, .metadata-table td:first-child {
+  padding-left: 1.5ch;
+}
+
+.metadata-table td:first-child {
+  font-weight: bold;
+}
+
+.tag-table {
+  text-indent: 3ch hanging;
+}
+
+
+.tag-table tbody td:last-child::before {
+  content: "=";
+  color: #999;
+  display: inline;
+  margin-left: 1ch;
+  margin-right: 1ch;
+}
+
+.tag-table tr td:first-child::before {
+  content: " ";
+  display: inline;
+  margin-right: 0.5ch;
+}
+
+.tag-table tr td:first-child {
+  /* prevent line break between ::before content and tag key when key is very long */
+  text-wrap: nowrap;
+}
+
+.tag-table tr.create td:first-child::before {
+  content: "+";
+  color: green;
+}
+
+.tag-table tr.modify td:first-child::before {
+  content: "~";
+  color: #db950a;
+}
+
+.tag-table tr.delete td:first-child::before {
+  content: "-";
+  color: red;
+}
+
+.tag-table tr.create {
+  color: green;
+}
+
+.tag-table tr.delete {
+  color: red;
+}
+
+.tag-table th:first-child {
+  padding-left: 1.5ch;
+}
+
+.tag-table th:last-child {
+  padding-left: 3ch;
+}

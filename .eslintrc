@@ -2,10 +2,10 @@
     "extends": "react-app",
     "rules": {
         "quotes": [
-            "error",
+            "warn",
             "single"
         ],
-        "no-unused-vars": "error"
+        "no-unused-vars": "warn"
     },
     "globals": {
         "Raven": true

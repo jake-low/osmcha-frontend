@@ -199,10 +199,13 @@ const TagChangesComponent = ({ changesetId, changes }: propsType) => {
   const [changeReport, setChangeReport] = useState([]);
   const [openAll, setOpenAll] = useState(false);
 
+  console.log(changesetId, changes);
+
   useEffect(() => {
     const newChangeReport = [];
     if (changes && changes.get(changesetId)) {
       const changesetData = changes.get(changesetId)['featureMap'];
+      console.log(changesetData);
       const processed = processFeatures(
         getFeatures(changesetData).filter(
           item => item.length === 2 && item[0].properties.action === 'modify'

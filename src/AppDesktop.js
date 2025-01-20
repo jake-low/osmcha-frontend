@@ -43,16 +43,20 @@ export const AppDesktop = () => {
                   component={Filters}
                   key={location.key}
                 />
-                <Route path="/changesets" component={NavbarChangeset} />
-                <Route
-                  path="/changesets"
-                  // Need to use render to avoid unmounting of
-                  // CMap Ref: https://reacttraining.com/react-router/web/api/Route/render-func
-                  // CMap and views/changeset.js are clubbed so they can be
-                  // loaded on demand in future.
-                  render={() => <CMap className="z0 fixed bottom right" />}
-                />
-                <Route path="/changesets/:id" component={Changeset} />
+                <div className="flex-parent flex-parent--column h-full">
+                  <Route path="/changesets" component={NavbarChangeset} />
+                  <div className="flex-child flex-child--grow relative">
+                    <Route
+                      path="/changesets"
+                      // Need to use render to avoid unmounting of
+                      // CMap Ref: https://reacttraining.com/react-router/web/api/Route/render-func
+                      // CMap and views/changeset.js are clubbed so they can be
+                      // loaded on demand in future.
+                      render={() => <CMap className="z0 fixed bottom right" />}
+                    />
+                    <Route path="/changesets/:id" component={Changeset} />
+                  </div>
+                </div>
                 <Route path="/about" component={About} />
                 <Route path="/stats" component={Stats} />
                 <Route path="/user" component={User} />

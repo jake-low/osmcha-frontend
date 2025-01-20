@@ -13,7 +13,12 @@ class SignInButton extends React.PureComponent {
 
   handleLoginClick = () => {
     getAuthUrl().then(res => {
-      window.location.assign(res.auth_url);
+      let url = res.auth_url.replace(
+        'https%3A%2F%2Fosmcha.org',
+        encodeURI('http://127.0.0.1')
+      );
+      console.log(url);
+      window.location.assign(url);
     });
   };
   render() {

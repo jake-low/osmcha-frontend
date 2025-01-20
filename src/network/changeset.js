@@ -1,4 +1,6 @@
 // @flow
+import adiffParser from '@osmcha/osm-adiff-parser';
+
 import { API_URL } from '../config';
 import { handleErrors } from './aoi';
 
@@ -14,6 +16,18 @@ export function fetchChangeset(id: number, token: ?string) {
     .then(res => {
       return res.json();
     });
+}
+
+export async function fetchAndParseAugmentedDiff(id: number) {
+  let res = await fetch(`https://adiffs.osmcha.org/changesets/${id}.adiff`);
+  if (res.status !== 200) {
+    throw new Error(
+      `GET /changesets/${id}.adiff returned ${res.status} ${res.statusText}`
+    );
+  }
+  let xml = await res.text();
+  let adiff = await adiffParser(xml);
+  return adiff;
 }
 
 export function setHarmful(id: number, token: string, harmful: boolean | -1) {
@@ -89,4 +103,34 @@ export function postComment(id: number, token: string, comment: string) {
     .then(res => {
       return res.json();
     });
+}
+
+export function flagFeature(changeset: number, feature: string, token: string) {
+  return fetch(
+    `${API_URL}/changesets/${changeset}/review-feature/${feature.replace(
+      '/',
+      '-'
+    )}`,
+    {
+      method: 'PUT',
+      headers: { Authorization: token ? `Token ${token}` : '' }
+    }
+  ).then(handleErrors);
+}
+
+export function unflagFeature(
+  changeset: number,
+  feature: string,
+  token: string
+) {
+  return fetch(
+    `${API_URL}/changesets/${changeset}/review-feature/${feature.replace(
+      '/',
+      '-'
+    )}`,
+    {
+      method: 'DELETE',
+      headers: { Authorization: token ? `Token ${token}` : '' }
+    }
+  ).then(handleErrors);
 }
