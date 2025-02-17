@@ -8,25 +8,25 @@ import { Loading } from '../loading';
 import { OpenAll } from '../open_all';
 import { ExpandItemIcon } from '../expand_item_icon';
 
-function processFeatures(features) {
+function otherChangesFromActions(actions) {
   const finalReport = new Map();
-  features = features.map(item => item[0]);
-  const keys = ['create', 'delete'];
-  keys.map(key =>
+  
+  for (const actionType of ['create', 'delete']) {
     finalReport.set(
-      key,
-      features
-        .filter(item => item.properties.action === key)
-        .map(item => ({ id: item.properties.id, type: item.properties.type }))
-    )
-  );
+      actionType,
+      actions
+        .filter(action => action.type === actionType)
+        .map(action => ({ id: action.new.id, type: action.new.type }))
+    );
+  }
+  
   finalReport.set(
     'modify',
-    features
-      .filter(item => item.properties.action === 'modify')
-      .filter(item => item.properties.type === 'relation')
-      .map(item => ({ id: item.properties.id, type: item.properties.type }))
+    actions
+      .filter(action => action.type === 'modify' && action.type === 'relation')
+      .map(action => ({ id: action.new.id, type: action.new.type }))
   );
+  
   return finalReport;
 }
 
@@ -75,8 +75,8 @@ const OtherFeaturesComponent = ({ changesetId, changes }: propsType) => {
   useEffect(() => {
     const newChangeReport = [];
     if (changes && changes.get(changesetId)) {
-      const changesetData = changes.get(changesetId)['featureMap'];
-      const processed = processFeatures(getFeatures(changesetData));
+      const adiff = changes.get(changesetId)['adiff'];
+      const processed = otherChangesFromActions(adiff.actions);
       processed.forEach((featureIDs, tag) =>
         newChangeReport.push([tag, featureIDs])
       );

@@ -13,15 +13,15 @@ import {
 } from '../network/changeset';
 import { fetchChangesetMetadata } from '../network/openstreetmap';
 // import { importChangesetMap } from '../utils/cmap';
-import {
-  apiOSM,
-  osmUrl,
-  isOfficialOSM,
-  osmchaUrl,
-  overpassBase,
-  enableRealChangesets,
-  mapboxAccessToken
-} from '../config/constants';
+// import {
+//   apiOSM,
+//   osmUrl,
+//   isOfficialOSM,
+//   osmchaUrl,
+//   overpassBase,
+//   enableRealChangesets,
+//   mapboxAccessToken
+// } from '../config/constants';
 
 import {
   getChangesetIdFromLocation,
@@ -303,7 +303,7 @@ export function* fetchChangesetMapAction(changesetId: number): Object {
 
     yield put(
       action(CHANGESET_MAP.fetched, {
-        data: null, // changesetMap,
+        data: { metadata, adiff },
         changesetId
       })
     );

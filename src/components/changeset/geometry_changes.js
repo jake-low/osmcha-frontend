@@ -1,6 +1,7 @@
 // @flow
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
+import deepEqual from 'deep-equal';
 
 import type { RootStateType } from '../store';
 import { getFeatures, FeatureListItem } from './tag_changes';
@@ -8,27 +9,31 @@ import { Loading } from '../loading';
 import { OpenAll } from '../open_all';
 import { ExpandItemIcon } from '../expand_item_icon';
 
-function processFeatures(features) {
+function geometryChangesFromActions(actions) {
   const finalReport = new Map();
-  const keys = ['node', 'way', 'relation'];
-  keys.map(key =>
-    finalReport.set(
-      key,
-      features
-        .filter(item => item[0].properties.action === 'modify')
-        .filter(item => item[0].properties.type === key)
-        .filter(
-          item =>
-            JSON.stringify(item[0].geometry) !==
-            JSON.stringify(item[1].geometry)
-        )
-        .map(item => ({ id: item[0].properties.id }))
+
+  let nodes = actions
+    .filter(action => 
+      action.type === 'modify'
+        && action.new.type == 'node'
+        && (action.new.lon !== action.old.lon || action.new.lat !== action.old.lat)
     )
-  );
+    .map(action => action.new.id);
+
+  let ways = actions
+    .filter(
+      action => action.type === 'modify' && action.new.type === 'way' &&
+        !deepEqual(action.old.nodes, action.new.nodes)
+    )
+    .map(action => action.new.id);
+
+  finalReport.set('node', nodes);
+  finalReport.set('way', ways);
+  
   return finalReport;
 }
 
-const GeometryChangesItem = ({ tag, features, opened }) => {
+const GeometryChangesItem = ({ elementType, elementIds, opened }) => {
   const titles = { node: 'Nodes', way: 'Ways', relation: 'Relations' };
   const [isOpen, setIsOpen] = useState(opened);
 
@@ -43,15 +48,13 @@ const GeometryChangesItem = ({ tag, features, opened }) => {
         onClick={() => setIsOpen(!isOpen)}
       >
         <ExpandItemIcon isOpen={isOpen} />
-        <span className="txt-bold">{titles[tag]}</span>
+        <span className="txt-bold">{titles[elementType]}</span>
         <strong className="bg-blue-faint color-blue-dark mx6 px6 py3 txt-s round">
-          {features.length}
+          {elementIds.length}
         </strong>
       </button>
       <ul className="cmap-vlist" style={{ display: isOpen ? 'block' : 'none' }}>
-        {features.map((item, k) => (
-          <FeatureListItem id={item.id} key={k} />
-        ))}
+        {elementIds.map(id => <FeatureListItem id={id} />)}
       </ul>
     </div>
   );
@@ -69,8 +72,9 @@ const GeometryChangesComponent = ({ changesetId, changes }: propsType) => {
   useEffect(() => {
     const newChangeReport = [];
     if (changes && changes.get(changesetId)) {
-      const changesetData = changes.get(changesetId)['featureMap'];
-      const processed = processFeatures(getFeatures(changesetData));
+      const adiff = changes.get(changesetId)['adiff'];
+      
+      const processed = geometryChangesFromActions(adiff.actions);
       processed.forEach((featureIDs, tag) =>
         newChangeReport.push([tag, featureIDs])
       );
@@ -92,11 +96,10 @@ const GeometryChangesComponent = ({ changesetId, changes }: propsType) => {
       </div>
       {changes.get(changesetId) ? (
         changeReport.length ? (
-          changeReport.map((change, k) => (
+          changeReport.map(([elementType, elementIds]) => (
             <GeometryChangesItem
-              key={k}
-              tag={change[0]}
-              features={change[1]}
+              elementType={elementType}
+              elementIds={elementIds}
               opened={openAll}
             />
           ))

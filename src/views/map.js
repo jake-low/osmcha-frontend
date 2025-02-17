@@ -16,6 +16,7 @@ import type { RootStateType } from '../store';
 let event;
 
 export function selectFeature(id: number) {
+  // FIXME used by other components, but currently doesn't work
   if (!id || !event) return;
   event.emit('selectFeature', 'node|way', id);
 }

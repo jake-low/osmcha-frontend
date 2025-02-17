@@ -14,23 +14,8 @@ class MapOptions extends React.PureComponent {
     user: true
   };
   layerOptions = [
-    {
-      label: 'Mapbox Satellite',
-      value: 'satellite',
-      function: () => this.toggleSatellite()
-    },
-    {
-      label: 'Mapbox Streets',
-      value: 'streets',
-      function: () => this.toggleStreet()
-    },
-    { label: 'Mapbox Dark', value: 'dark', function: () => this.toggleDark() },
     { label: 'Bing', value: 'bing', function: () => this.toggleBing() },
-    {
-      label: 'OpenStreetMap Carto',
-      value: 'carto',
-      function: () => this.toggleOsm()
-    }
+    { label: 'OpenStreetMap Carto', value: 'carto', function: () => this.toggleOsm() }
   ];
   getLayerDropdownDisplay = id => {
     const filteredLayer = this.layerOptions.filter(l => l.value === id);
@@ -46,24 +31,6 @@ class MapOptions extends React.PureComponent {
   onChange = () => {
     // importChangesetMap('getMapInstance').then(
     //   r => r && r() && r().filterLayers()
-    // );
-  };
-  toggleSatellite = () => {
-    // importChangesetMap('getMapInstance').then(
-    //   r =>
-    //     r &&
-    //     r() &&
-    //     r().renderMap('mapbox://styles/openstreetmap/cjnd8lj0e10i42spfo4nsvoay')
-    // );
-  };
-  toggleDark = () => {
-    // importChangesetMap('getMapInstance').then(
-    //   r => r && r() && r().renderMap('mapbox://styles/mapbox/dark-v9')
-    // );
-  };
-  toggleStreet = () => {
-    // importChangesetMap('getMapInstance').then(
-    //   r => r && r() && r().renderMap('mapbox://styles/mapbox/streets-v9')
     // );
   };
   toggleBing = () => {
@@ -133,9 +100,9 @@ class MapOptions extends React.PureComponent {
         <section className="cmap-filter-action-section cmap-pt3">
           <h6 className="cmap-heading pointer txt-bold">Filter by actions</h6>
 
-          <ul className="cmap-hlist">
-            <li>
-              <label className="cmap-hlist-item cmap-noselect cmap-pointer">
+          <ul className="flex-parent">
+            <li className="px6">
+              <label>
                 <input
                   type="checkbox"
                   value="added"
@@ -143,12 +110,11 @@ class MapOptions extends React.PureComponent {
                   id="cmap-layer-selector-added"
                   onChange={this.onChange}
                 />
-                <span className="cmap-label-text">Added</span>
-                <span className="cmap-color-box cmap-color-added" />
+                Added
               </label>
             </li>
-            <li>
-              <label className="cmap-hlist-item cmap-noselect cmap-pointer">
+            <li className="px6">
+              <label>
                 <input
                   type="checkbox"
                   value="modified"
@@ -156,14 +122,11 @@ class MapOptions extends React.PureComponent {
                   onChange={this.onChange}
                   id="cmap-layer-selector-modified"
                 />
-                <span className="cmap-label-text">Modified</span>
-                <span className="cmap-color-box cmap-color-modified-old" />
-                <span className="cmap-unicode">→</span>
-                <span className="cmap-color-box cmap-color-modified-new" />
+                Modified
               </label>
             </li>
-            <li>
-              <label className="cmap-hlist-item cmap-noselect cmap-pointer">
+            <li className="px6">
+              <label>
                 <input
                   type="checkbox"
                   value="deleted"
@@ -171,17 +134,16 @@ class MapOptions extends React.PureComponent {
                   onChange={this.onChange}
                   id="cmap-layer-selector-deleted"
                 />
-                <span className="cmap-label-text">Deleted</span>
-                <span className="cmap-color-box cmap-color-deleted" />
+                Deleted
               </label>
             </li>
           </ul>
         </section>
         <section className="cmap-filter-type-section">
-          <h6 className="cmap-heading pointer txt-bold">Filter by type</h6>
-          <ul className="cmap-hlist">
-            <li>
-              <label className="cmap-hlist-item cmap-noselect cmap-pointer">
+          <h6 className="txt-bold">Filter by type</h6>
+          <ul className="flex-parent">
+            <li className="px6">
+              <label>
                 <input
                   type="checkbox"
                   value="nodes"
@@ -189,11 +151,11 @@ class MapOptions extends React.PureComponent {
                   id="cmap-type-selector-nodes"
                   onChange={this.onChange}
                 />
-                <span className="cmap-label-text">Nodes</span>
+                Nodes
               </label>
             </li>
-            <li>
-              <label className="cmap-hlist-item cmap-noselect cmap-pointer">
+            <li className="px6">
+              <label>
                 <input
                   type="checkbox"
                   value="ways"
@@ -201,11 +163,11 @@ class MapOptions extends React.PureComponent {
                   id="cmap-type-selector-ways"
                   onChange={this.onChange}
                 />
-                <span className="cmap-label-text">Ways</span>
+                Ways
               </label>
             </li>
-            <li>
-              <label className="cmap-hlist-item cmap-noselect cmap-pointer">
+            <li className="px6">
+              <label>
                 <input
                   type="checkbox"
                   value="relations"
@@ -213,7 +175,7 @@ class MapOptions extends React.PureComponent {
                   id="cmap-type-selector-relations"
                   onChange={this.onChange}
                 />
-                <span className="cmap-label-text">Relations</span>
+                Relations
               </label>
             </li>
           </ul>

@@ -138,9 +138,7 @@ export class _Changeset extends React.PureComponent<*, propsType, *> {
             <Discussions
               changesetAuthor={currentChangeset.get('properties').get('user')}
               discussions={
-                this.props.osmInfo
-                  ? this.props.osmInfo.getIn(['changeset', 'comments'])
-                  : List()
+                this.props.osmInfo?.getIn(['metadata', 'changeset', 'comments']) ?? List()
               }
               changesetIsHarmful={properties.get('harmful')}
               changesetId={changesetId}
@@ -233,6 +231,7 @@ export class _Changeset extends React.PureComponent<*, propsType, *> {
   render() {
     const { bindingsState, currentChangeset } = this.props;
     const features = currentChangeset.getIn(['properties', 'features']);
+    console.log("osmInfo", this.props.osmInfo);
     return (
       <div className="flex-child clip">
         <ControlLayout
@@ -247,9 +246,7 @@ export class _Changeset extends React.PureComponent<*, propsType, *> {
           features={features}
           bindingsState={bindingsState}
           discussions={
-            this.props.osmInfo
-              ? this.props.osmInfo.getIn(['changeset', 'comments'])
-              : List()
+            this.props.osmInfo?.getIn(['metadata', 'changeset', 'comments']) ?? List()
           }
         />
         <Floater style={{ marginTop: 5, marginLeft: 41 }}>

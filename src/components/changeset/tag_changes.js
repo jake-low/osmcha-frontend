@@ -14,11 +14,9 @@ export function getFeatures(features) {
   return keys.map(item => features[item]);
 }
 
-export function processFeatures(features) {
+export function tagChangesFromActions(actions) {
   const finalReport = new Map();
-  const analyzedFeatures = features.map(feature =>
-    analyzeFeature(feature[0], feature[1])
-  );
+  const analyzedFeatures = actions.map(analyzeAction);
   const keys = ['addedTags', 'changedValues', 'deletedTags'];
   analyzedFeatures.map(item =>
     keys.map(key =>
@@ -43,9 +41,9 @@ export function processFeatures(features) {
   return finalReport;
 }
 
-export function analyzeFeature(newVersion, oldVersion) {
-  const oldVersionKeys = Object.keys(oldVersion.properties.tags);
-  const newVersionKeys = Object.keys(newVersion.properties.tags);
+export function analyzeAction(action) {
+  const oldVersionKeys = Object.keys(action.old.tags);
+  const newVersionKeys = Object.keys(action.new.tags);
   const addedTags = newVersionKeys.filter(tag => !oldVersionKeys.includes(tag));
   const deletedTags = oldVersionKeys.filter(
     tag => !newVersionKeys.includes(tag)
@@ -53,31 +51,31 @@ export function analyzeFeature(newVersion, oldVersion) {
   const changedValues = newVersionKeys
     .filter(tag => !addedTags.includes(tag) && !deletedTags.includes(tag))
     .filter(
-      tag => newVersion.properties.tags[tag] !== oldVersion.properties.tags[tag]
+      tag => action.new.tags[tag] !== action.old.tags[tag]
     );
   const result = new Map();
   result
-    .set('id', newVersion.properties.id)
-    .set('type', newVersion.properties.type)
+    .set('id', action.new.id)
+    .set('type', action.new.type)
     .set(
       'addedTags',
       addedTags.map(tag => [
         `Added tag ${tag}`,
-        newVersion.properties.tags[tag]
+        action.new.tags[tag]
       ])
     )
     .set(
       'deletedTags',
       deletedTags.map(tag => [
         `Deleted tag ${tag}`,
-        oldVersion.properties.tags[tag]
+        action.old.tags[tag]
       ])
     )
     .set(
       'changedValues',
       changedValues.map(tag => [
         `Changed value of tag ${tag}`,
-        [oldVersion.properties.tags[tag], newVersion.properties.tags[tag]]
+        [action.old.tags[tag], action.new.tags[tag]]
       ])
     );
   return result;
@@ -199,18 +197,13 @@ const TagChangesComponent = ({ changesetId, changes }: propsType) => {
   const [changeReport, setChangeReport] = useState([]);
   const [openAll, setOpenAll] = useState(false);
 
-  console.log(changesetId, changes);
-
   useEffect(() => {
     const newChangeReport = [];
     if (changes && changes.get(changesetId)) {
-      const changesetData = changes.get(changesetId)['featureMap'];
-      console.log(changesetData);
-      const processed = processFeatures(
-        getFeatures(changesetData).filter(
-          item => item.length === 2 && item[0].properties.action === 'modify'
-        )
-      );
+      const adiff = changes.get(changesetId)['adiff'];
+      const modifyActions = adiff.actions.filter(action => action.type === 'modify');
+      
+      const processed = tagChangesFromActions(modifyActions);
       processed.forEach((featureIDs, tag) =>
         newChangeReport.push([tag, featureIDs])
       );
