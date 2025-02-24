@@ -30,7 +30,8 @@ async function loadDiffViewer(onClick) {
   // }
   // let xml = await res.text();
   // let adiff = await adiffParser(xml);
-  return new MapLibreAugmentedDiffViewer(adiff.actions, { onClick });
+  console.log(adiff);
+  return new MapLibreAugmentedDiffViewer(adiff, { onClick });
 }
 
 class CMap extends React.PureComponent {
@@ -74,7 +75,6 @@ class CMap extends React.PureComponent {
 
     let map = new maplibre.Map({
       container,
-      // style: 'https://api.maptiler.com/maps/satellite/style.json?key=hAHwpkEzPARYSwpwQ1gi',
       style: {
         version: 8,
         sources: {
@@ -127,6 +127,8 @@ class CMap extends React.PureComponent {
     map.on('load', async () => {
       let adiffViewer = await adiffViewerPromise;
       if (adiffViewer) {
+        console.log(adiffViewer.geojson);
+        console.log(adiffViewer.bounds());
         adiffViewer.addTo(map);
         map.jumpTo(map.cameraForBounds(adiffViewer.bounds(), { padding: 50 }));
       }
