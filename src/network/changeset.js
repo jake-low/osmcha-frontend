@@ -31,7 +31,7 @@ export async function fetchAndParseAugmentedDiff(id: number) {
 /// Overpass server if that fails.
 async function fetchAugmentedDiff(id: number) {
   try {
-    return fetchAugmentedDiffFromAdiffService(id);
+    return await fetchAugmentedDiffFromAdiffService(id);
   } catch (err) {
     console.error(err);
     return await fetchAugmentedDiffFromOverpass(id);
