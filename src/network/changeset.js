@@ -1,7 +1,9 @@
 // @flow
 import adiffParser from '@osmcha/osm-adiff-parser';
+import { parse, subSeconds } from 'date-fns';
 
-import { API_URL } from '../config';
+import { API_URL, appVersion } from '../config';
+import { adiffServiceUrl, apiOSM, overpassBase } from '../config/constants.js';
 import { handleErrors } from './aoi';
 
 export function fetchChangeset(id: number, token: ?string) {
@@ -19,15 +21,66 @@ export function fetchChangeset(id: number, token: ?string) {
 }
 
 export async function fetchAndParseAugmentedDiff(id: number) {
-  let res = await fetch(`https://adiffs.osmcha.org/changesets/${id}.adiff`);
+  let xml = await fetchAugmentedDiff(id);
+  let adiff = await adiffParser(xml);
+  return adiff;
+}
+
+/// Fetch an augmented diff for the given changeset ID. Tries to fetch from the
+/// configured adiff service (if it exists) and falls back to using the configured
+/// Overpass server if that fails.
+async function fetchAugmentedDiff(id: number) {
+  try {
+    return fetchAugmentedDiffFromAdiffService(id);
+  } catch (err) {
+    console.error(err);
+    return await fetchAugmentedDiffFromOverpass(id);
+  }
+}
+
+async function fetchAugmentedDiffFromAdiffService(id: number) {
+  let res = await fetch(`${adiffServiceUrl}/changesets/${id}.adiff`);
   if (res.status !== 200) {
     throw new Error(
       `GET /changesets/${id}.adiff returned ${res.status} ${res.statusText}`
     );
   }
-  let xml = await res.text();
-  let adiff = await adiffParser(xml);
-  return adiff;
+  return await res.text();
+}
+
+async function fetchAugmentedDiffFromOverpass(id: number) {
+  let res = await fetch(`${apiOSM}/changeset/${id}.json`);
+  let { changeset } = await res.json();
+  let createdAt = parse(
+    changeset.created_at,
+    "yyyy-MM-dd'T'HH:mm:ssX",
+    new Date()
+  );
+  let closedAt =
+    changeset.closed_at &&
+    parse(changeset.closed_at, "yyyy-MM-dd'T'HH:mm:ssX", new Date());
+
+  let adiffArgs = [subSeconds(createdAt, 1), closedAt]
+    .filter(Boolean)
+    .map(d => `"${d.toISOString()}"`)
+    .join(',');
+
+  let data = `[out:xml][adiff:${adiffArgs}];`;
+  data +=
+    '(node(bbox)(changed);way(bbox)(changed);relation(bbox)(changed););out meta geom(bbox);';
+
+  let epsilon = 0.00001;
+  let bbox = [
+    changeset.min_lon - epsilon || -180,
+    changeset.min_lat - epsilon || -90,
+    changeset.max_lon + epsilon || 180,
+    changeset.max_lat + epsilon || 90
+  ];
+
+  res = await fetch(
+    `${overpassBase}?data=${encodeURIComponent(data)}&bbox=${bbox.join(',')}`
+  );
+  return await res.text();
 }
 
 export function setHarmful(id: number, token: string, harmful: boolean | -1) {

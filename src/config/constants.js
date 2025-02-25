@@ -21,6 +21,8 @@ export const osmUrl =
 export const isOfficialOSM = osmUrl === 'https://www.openstreetmap.org';
 export const apiOSM =
   process.env.REACT_APP_OSM_API || 'https://api.openstreetmap.org/api/0.6';
+export const adiffServiceUrl =
+  process.env.REACT_APP_ADIFF_SERVICE_URL || 'https://adiffs.osmcha.org';
 
 export const whosThat =
   'https://whosthat.osmz.ru/whosthat.php?action=names&id=';

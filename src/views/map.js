@@ -2,7 +2,6 @@ import React from 'react';
 import { connect } from 'react-redux';
 import maplibre from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
-import adiffParser from '@osmcha/osm-adiff-parser';
 import { MapLibreAugmentedDiffViewer } from '@osmcha/maplibre-adiff-viewer';
 
 import { Loading } from '../components/loading';
@@ -24,13 +23,9 @@ export function selectFeature(id: number) {
 async function loadDiffViewer(onClick) {
   let changesetId = window.location.pathname.split('/').slice(-1)[0];
   let adiff = await fetchAndParseAugmentedDiff(changesetId);
-  // let res = await fetch(`https://adiffs.osmcha.org/changesets/${changesetId}.adiff`);
-  // if (res.status !== 200) {
-  //   throw new Error(`GET /changesets/${changesetId}.adiff returned ${res.status} ${res.statusText}`);
-  // }
-  // let xml = await res.text();
-  // let adiff = await adiffParser(xml);
-  console.log(adiff);
+  // HACK: override attribution string (the string Overpass sends is wordier and doesn't have a hyperlink)
+  adiff.note =
+    'Map data from <a href=https://openstreetmap.org/copyright>OpenStreetMap</a>';
   return new MapLibreAugmentedDiffViewer(adiff, { onClick });
 }
 
@@ -88,8 +83,7 @@ class CMap extends React.PureComponent {
             ],
             tileSize: 256,
             maxzoom: 20,
-            attribution:
-              'Map data from <a href=https://openstreetmap.org/copyright>OpenStreetMap</a> | Imagery © Microsoft Corporation'
+            attribution: 'Imagery © Microsoft Corporation'
           }
         },
         layers: [
