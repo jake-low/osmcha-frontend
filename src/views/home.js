@@ -1,91 +1,54 @@
 // @flow
 import React from 'react';
-import { Link } from 'react-router-dom';
-
-import { appVersion, isDev, isStaging, isLocal } from '../config';
-import banner from '../assets/banner.png';
-import work_flow from '../assets/work_flow.png';
-import osmus from '../assets/osmus.png';
 
 export function Home() {
   return (
     <div className="flex-parent flex-parent--column flex-parent--center-cross h-full">
       <div className="flex-child flex-child--grow">&nbsp;</div>
-      <div className="flex-parent flex-parent--column flex-parent--center-cross ">
-        <img src={banner} className="osmcha-logo" alt="OSMCHA" />
-        <img
-          src={work_flow}
-          className="pt36 workflow-img"
-          alt="Filter, Select, View, Verify"
-        />
-      </div>
-      <div className="flex-child flex-child--grow">&nbsp;</div>
-      <div className="flex-parent flex-parent--column align-center txt-l">
-        <div className="txt-xl">
-          v{appVersion}
-          {isDev && ' Dev'}
-          {isStaging && ' Staging'}
-          {isLocal && ' Local'}
-        </div>
-        <div className="flex-parent flex-parent--row flex-parent--center-main">
-          <Link
-            className="link link--gray flex-parent flex-parent--row flex-parent--center-cross mx6"
-            to="/about"
-          >
-            <svg className="icon">
-              <use xlinkHref="#icon-info" />
-            </svg>{' '}
-            <span>Guide</span>
-          </Link>{' '}
-          |{' '}
-          <a
-            target="__blank"
-            className="link link--gray flex-parent flex-parent--row flex-parent--center-cross mx6"
-            href="https://github.com/osmcha/osmcha-frontend/blob/master/CONTRIBUTING.md"
-          >
-            <svg className="icon">
-              <use xlinkHref="#icon-github" />
-            </svg>{' '}
-            <span>GitHub</span>
-          </a>{' '}
-          |{' '}
-          <a
-            target="__blank"
-            className="link link--gray flex-parent flex-parent--row flex-parent--center-cross mx6"
-            href="https://openstreetmap.app.neoncrm.com/forms/osmcha"
-          >
-            <svg className="icon">
-              <use xlinkHref="#icon-creditcard" />
-            </svg>{' '}
-            <span>Donate</span>
-          </a>
-          |{' '}
-          <a
-            target="__blank"
-            className="link link--gray flex-parent flex-parent--row flex-parent--center-cross mx6"
-            href="https://github.com/osmcha/osmcha-frontend/issues"
-          >
-            <svg className="icon">
-              <use xlinkHref="#icon-bug" />
-            </svg>{' '}
-            <span>File an issue</span>
-          </a>
-        </div>
-      </div>
-      <div className="flex-parent flex-parent--column align-center txt-l pt12">
-        <p className="block pt36 pb6 txt-m">Supported by</p>
-        <a
-          target="__blank"
-          className="link link--gray flex-parent flex-parent--row flex-parent--center-cross mx6"
-          href="https://openstreetmap.us"
-        >
-          <img
-            src={osmus}
-            className="osmus-img"
-            alt="An OpenStreetMap US charter project"
-          />
-        </a>
-      </div>
+      <section
+        className="py36"
+        style={{
+          textAlign: 'left',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '1em'
+        }}
+      >
+        <p>
+          <strong>This is a preview version of OSMCha.</strong> Significant
+          changes include:
+        </p>
+        <ul className="pl24" style={{ listStyleType: 'initial' }}>
+          <li>
+            The frontend uses MapLibre and{' '}
+            <code>@osmcha/maplibre-adiff-viewer</code> to render changesets,
+            rather than <code>changeset-map</code>
+          </li>
+          <li>
+            Changeset data is fetched from <code>adiffs.osmcha.org</code> rather
+            than from the <code>real-changesets</code> S3 bucket
+          </li>
+        </ul>
+        <p>
+          To try out this version of OSMCha, you'll need to "log in" using an
+          ugly hack. Follow these steps:
+        </p>
+        <ol className="pl24" style={{ listStyleType: 'initial' }}>
+          <li>
+            Go to <a href="https://osmcha.org">https://osmcha.org</a>, and open
+            your browser's DevTools
+          </li>
+          <li>
+            Run <code>localStorage.getItem("token")</code> in the console and
+            copy the resulting string
+          </li>
+          <li>
+            Return to this page, open the DevTools, and run{' '}
+            <code>localStorage.setItem("token", &lt;copied value&gt;)</code>
+          </li>
+          <li>Refresh the page. You should now be logged in.</li>
+        </ol>
+      </section>
       <div className="flex-child flex-child--grow">&nbsp;</div>
     </div>
   );
