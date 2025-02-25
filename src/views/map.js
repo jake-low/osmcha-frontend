@@ -20,15 +20,6 @@ export function selectFeature(id: number) {
   event.emit('selectFeature', 'node|way', id);
 }
 
-async function loadDiffViewer(onClick) {
-  let changesetId = window.location.pathname.split('/').slice(-1)[0];
-  let adiff = await fetchAndParseAugmentedDiff(changesetId);
-  // HACK: override attribution string (the string Overpass sends is wordier and doesn't have a hyperlink)
-  adiff.note =
-    'Map data from <a href=https://openstreetmap.org/copyright>OpenStreetMap</a>';
-  return new MapLibreAugmentedDiffViewer(adiff, { onClick });
-}
-
 class CMap extends React.PureComponent {
   props: {
     changesetId: number,
@@ -54,14 +45,19 @@ class CMap extends React.PureComponent {
   componentDidUpdate(prevProps: Object) {
     if (
       this.props.token !== prevProps.token ||
-      this.props.changesetId !== prevProps.changesetId
+      this.props.changesetId !== prevProps.changesetId ||
+      !prevProps.changeset
     ) {
-      this.setState({ selected: null });
+      this.setState({ selected: null, loading: true });
       this.initializeMap();
     }
   }
 
   initializeMap() {
+    if (!this.props.changeset) {
+      return;
+    }
+
     let container = document.getElementById('container');
 
     if (this.map) {
@@ -106,25 +102,27 @@ class CMap extends React.PureComponent {
     map.touchZoomRotate.disableRotation();
     map.keyboard.disableRotation();
 
-    // start loading the diff viewer (and the required diff file) here, rather
-    // than after the 'load' event fires, to reduce total load time
-    let adiffViewerPromise = loadDiffViewer(this.handleClick)
-      .catch(error => {
-        this.props.modal({
-          type: 'error',
-          title: 'Error loading changeset map',
-          description: error.message
-        });
-      })
-      .finally(() => this.setState({ loading: false }));
+    let { adiff } = this.props.changeset;
+    // HACK: override attribution string (the string Overpass sends is wordier and doesn't have a hyperlink)
+    adiff.note =
+      'Map data from <a href=https://openstreetmap.org/copyright>OpenStreetMap</a>';
+    const adiffViewer = new MapLibreAugmentedDiffViewer(adiff, {
+      onClick: this.handleClick
+    });
 
     map.on('load', async () => {
-      let adiffViewer = await adiffViewerPromise;
+      this.setState({ loading: false });
+
       if (adiffViewer) {
         console.log(adiffViewer.geojson);
         console.log(adiffViewer.bounds());
         adiffViewer.addTo(map);
-        map.jumpTo(map.cameraForBounds(adiffViewer.bounds(), { padding: 50 }));
+        map.jumpTo(
+          map.cameraForBounds(adiffViewer.bounds(), {
+            padding: 50,
+            maxZoom: 18
+          })
+        );
       }
     });
 
@@ -138,6 +136,7 @@ class CMap extends React.PureComponent {
 
   render() {
     console.log(`CMap render with changesetId = ${this.props.changesetId}`);
+    console.log(this.props.style);
     if (this.props.token) {
       return (
         <React.Fragment>
@@ -183,6 +182,10 @@ class CMap extends React.PureComponent {
 CMap = connect(
   (state: RootStateType, props) => ({
     changesetId: state.changeset.get('changesetId'),
+    changeset: state.changeset.getIn([
+      'changesetMap',
+      state.changeset.get('changesetId')
+    ]),
     style: state.mapControls.get('style'),
     token: state.auth.get('token')
   }),
