@@ -5,9 +5,13 @@ import debounce from 'lodash.debounce';
 import { Async } from 'react-select';
 import Select from 'react-select';
 
-import maplibre from "maplibre-gl";
-import { TerraDraw, TerraDrawRectangleMode, TerraDrawRenderMode } from "terra-draw";
-import { TerraDrawMapLibreGLAdapter } from "terra-draw-maplibre-gl-adapter";
+import maplibre from 'maplibre-gl';
+import {
+  TerraDraw,
+  TerraDrawRectangleMode,
+  TerraDrawRenderMode
+} from 'terra-draw';
+import { TerraDrawMapLibreGLAdapter } from 'terra-draw-maplibre-gl-adapter';
 import area from '@turf/area';
 import bbox from '@turf/bbox';
 import simplify from '@turf/simplify';
@@ -18,7 +22,7 @@ import { nominatimSearch } from '../../network/nominatim';
 
 export class LocationSelect extends React.PureComponent {
   props: {
-    name: string, // FIXME: test comment
+    name: string,
     display: string,
     value: Object,
     type: string,
@@ -45,7 +49,7 @@ export class LocationSelect extends React.PureComponent {
   componentDidMount() {
     let map = new maplibre.Map({
       container: 'geometry-map',
-      style: '/positron.json',
+      style: '/positron.json'
     });
     map.setMaxPitch(0);
     map.dragRotate.disable();
@@ -61,53 +65,53 @@ export class LocationSelect extends React.PureComponent {
       // FIXME: this doesn't work; how can we draw an existing geometry on the map?
       this.updateMap(this.props.value);
     }
-    
+
     let draw = new TerraDraw({
       adapter: new TerraDrawMapLibreGLAdapter({ map, lib: maplibre }),
       modes: [
         new TerraDrawRectangleMode(),
-        new TerraDrawRenderMode({ modeName: "render" }),
+        new TerraDrawRenderMode({ modeName: 'render' })
       ]
     });
 
     draw.start();
 
-    draw.on("finish", (id, context) => {
+    draw.on('finish', (id, context) => {
       console.log(id, context);
       const snapshot = draw.getSnapshot();
-      const feature = snapshot.find((f) => f.id === id);
+      const feature = snapshot.find(f => f.id === id);
       const bounds = bbox(feature); // even though the user drew a box, 'feature' is a Polygon
       console.log(bounds);
       const wsen = bounds.map(v => v.toFixed(4)).join(',');
-      
+
       this.props.onChange('geometry', undefined);
       this.props.onChange('in_bbox', fromJS([{ label: wsen, value: wsen }]));
     });
 
     this.map = map;
     this.draw = draw;
-    
+
     document.addEventListener('keydown', this.handleKeyDown);
     document.addEventListener('keyup', this.handleKeyUp);
   }
-  
+
   componentWillUnmount() {
     document.removeEventListener('keydown', this.handleKeyDown);
     document.removeEventListener('keyup', this.handleKeyUp);
   }
 
-  handleKeyDown = (event) => {
+  handleKeyDown = event => {
     if (event.key === 'Shift') {
       this.draw.clear();
-      this.draw.setMode("rectangle");
+      this.draw.setMode('rectangle');
     }
-  }
+  };
 
-  handleKeyUp = (event) => {
+  handleKeyUp = event => {
     if (event.key === 'Shift') {
-      this.draw.setMode("render");
+      this.draw.setMode('render');
     }
-  }
+  };
 
   updateMap(data) {
     // called with geojson polygon of a feature that was retrieved by
@@ -124,7 +128,7 @@ export class LocationSelect extends React.PureComponent {
         }
       });
     }
-    
+
     if (this.map.getLayer('geometry') === undefined) {
       this.map.addLayer({
         id: 'geometry',
@@ -136,7 +140,7 @@ export class LocationSelect extends React.PureComponent {
         }
       });
     }
-    
+
     this.setState({ geometry: data });
     this.props.onChange('in_bbox', undefined);
     this.props.onChange('geometry', fromJS([{ label: data, value: data }]));
@@ -151,14 +155,14 @@ export class LocationSelect extends React.PureComponent {
           if (!Array.isArray(json)) return cb(null, { options: [] });
 
           console.log(json);
-          
+
           const data = json.map(d => ({
             label: d.display_name,
             value: d.geojson
           }));
 
           console.log(data);
-          
+
           return cb(null, { options: data });
         })
         .catch(e => cb(e, null));
@@ -166,7 +170,7 @@ export class LocationSelect extends React.PureComponent {
       return cb(null, { options: [] });
     }
   };
-  
+
   isOneCharInputAllowed = (input: string) => {
     // Allowing one character input if it contains characters from certain scripts while
     // guarding against browsers that don't support this kind of regular expression
@@ -179,7 +183,7 @@ export class LocationSelect extends React.PureComponent {
       return true;
     }
   };
-  
+
   onChangeLocal = (data: ?Array<Object>) => {
     console.log(data);
     if (data) {
@@ -194,11 +198,11 @@ export class LocationSelect extends React.PureComponent {
       );
     }
   };
-  
+
   handleQueryTypeChange = value => {
     this.setState({ queryType: value });
   };
-  
+
   renderSelect = () => {
     const { name, placeholder, value } = this.props;
     return (
@@ -215,7 +219,7 @@ export class LocationSelect extends React.PureComponent {
       />
     );
   };
-  
+
   render() {
     console.log(this.props);
     return (
@@ -234,7 +238,7 @@ export class LocationSelect extends React.PureComponent {
         </div>
         <div className="grid grid--gut12 pt6">
           <div className="col col--12 map-select">
-            <div id="geometry-map"/>
+            <div id="geometry-map" />
           </div>
         </div>
         <p>
