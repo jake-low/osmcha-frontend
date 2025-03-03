@@ -238,13 +238,9 @@ function TagsTable({ action }) {
               <tr className="modify">
                 <td>{key}</td>
                 <td>
-                  <span
-                    style={{ color: 'red', textDecoration: '-line-through' }}
-                  >
-                    {oldval}
-                  </span>
+                  <del>{oldval}</del>
                   {' → '}
-                  <span style={{ color: 'green' }}>{newval}</span>
+                  <ins>{newval}</ins>
                 </td>
               </tr>
             );

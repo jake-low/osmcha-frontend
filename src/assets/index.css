@@ -543,14 +543,14 @@ th {
 .tag-table {
   text-indent: 3ch hanging;
 
-  --color-create: #006c00;
+  --color-create: #007554;
   --color-modify: #b77a00;
-  --color-delete: #ec0000;
+  --color-delete: #ee0028;
 }
 
 .tag-table tr.create {
   color: var(--color-create);
-  background-color: #e6ffe6;
+  background-color: #dbfff5;
 }
 
 .tag-table tr.modify {
@@ -560,7 +560,17 @@ th {
 
 .tag-table tr.delete {
   color: var(--color-delete);
-  background-color: #ffdfdf;
+  background-color: #ffe3e7;
+}
+
+.tag-table ins {
+  color: var(--color-create);
+  text-decoration: none;
+}
+
+.tag-table del {
+  color: var(--color-delete);
+  text-decoration: none;
 }
 
 .tag-table tbody td:last-child::before {
