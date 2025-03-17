@@ -511,6 +511,12 @@ th {
   text-align: left;
 }
 
+.element-info {
+  --color-create: #007554;
+  --color-modify: #b77a00;
+  --color-delete: #ee0028;
+}
+
 .element-info hr {
   border-bottom: 1px solid #ddd;
   margin: 1em 0;
@@ -522,18 +528,10 @@ th {
   margin: 0.25em 0;
 }
 
-.tag-table, .metadata-table {
+.element-info table {
   font-family: monospace;
   line-height: 1.1;
   white-space: pre-wrap;
-}
-
-.metadata-table th, .metadata-table td {
-  padding: 0 1ch;
-}
-
-.metadata-table th:first-child, .metadata-table td:first-child {
-  padding-left: 1.5ch;
 }
 
 .metadata-table td:first-child {
@@ -542,35 +540,65 @@ th {
 
 .tag-table {
   text-indent: 3ch hanging;
-
-  --color-create: #007554;
-  --color-modify: #b77a00;
-  --color-delete: #ee0028;
 }
 
-.tag-table tr.create {
+.element-info tr.create {
   color: var(--color-create);
   background-color: #dbfff5;
 }
 
-.tag-table tr.modify {
+.element-info tr.modify {
   color: var(--color-modify);
   background-color: #fff3da;
 }
 
-.tag-table tr.delete {
+.element-info tr.delete {
   color: var(--color-delete);
   background-color: #ffe3e7;
 }
 
-.tag-table ins {
+.element-info table ins {
   color: var(--color-create);
   text-decoration: none;
 }
 
-.tag-table del {
+.element-info table del {
   color: var(--color-delete);
   text-decoration: none;
+}
+
+.element-info tr td:first-child::before {
+  content: " ";
+  display: inline;
+  margin-right: 0.5ch;
+}
+
+.element-info tr td:first-child {
+  /* prevent line break between ::before content and tag key when key is very long */
+  text-wrap: nowrap;
+}
+
+.element-info tr.create td:first-child::before {
+  content: "+";
+  color: var(--color-create);
+}
+
+.element-info tr.modify td:first-child::before {
+  content: "~";
+  color: var(--color-modify);
+}
+
+.element-info tr.delete td:first-child::before {
+  content: "-";
+  color: var(--color-delete);
+}
+
+.element-info th:first-child {
+  padding-left: 1.5ch;
+}
+
+.tag-table th:last-child {
+  padding-left: 3ch;
 }
 
 .tag-table tbody td:last-child::before {
@@ -581,36 +609,3 @@ th {
   margin-right: 1ch;
 }
 
-.tag-table tr td:first-child::before {
-  content: " ";
-  display: inline;
-  margin-right: 0.5ch;
-}
-
-.tag-table tr td:first-child {
-  /* prevent line break between ::before content and tag key when key is very long */
-  text-wrap: nowrap;
-}
-
-.tag-table tr.create td:first-child::before {
-  content: "+";
-  color: var(--color-create);
-}
-
-.tag-table tr.modify td:first-child::before {
-  content: "~";
-  color: var(--color-modify);
-}
-
-.tag-table tr.delete td:first-child::before {
-  content: "-";
-  color: var(--color-delete);
-}
-
-.tag-table th:first-child {
-  padding-left: 1.5ch;
-}
-
-.tag-table th:last-child {
-  padding-left: 3ch;
-}

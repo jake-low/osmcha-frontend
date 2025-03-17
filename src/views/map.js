@@ -7,7 +7,6 @@ import { MapLibreAugmentedDiffViewer } from '@osmcha/maplibre-adiff-viewer';
 import { Loading } from '../components/loading';
 import { SignIn } from '../components/sign_in';
 import ElementInfo from '../components/element_info';
-import { fetchAndParseAugmentedDiff } from '../network/changeset';
 import { updateStyle } from '../store/map_controls_actions';
 import { modal } from '../store/modal_actions';
 import type { RootStateType } from '../store';
@@ -151,7 +150,7 @@ class CMap extends React.PureComponent {
                 minWidth: '400px',
                 maxWidth: '550px',
                 maxHeight: '60vh',
-                overflowY: 'scroll'
+                overflowY: 'auto'
               }}
             >
               <ElementInfo action={this.state.selected} />

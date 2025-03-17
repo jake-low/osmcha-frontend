@@ -33,6 +33,12 @@ function ElementInfo({ changeset, action, token }) {
       <MetadataTable action={action} />
       <hr />
       <TagsTable action={action} />
+      {action.new.type === 'relation' && (
+        <React.Fragment>
+          <hr />
+          <RelationMembersTable action={action} />
+        </React.Fragment>
+      )}
     </div>
   );
 }
@@ -230,7 +236,7 @@ function TagsTable({ action }) {
             return (
               <tr className="delete">
                 <td>{key}</td>
-                <td style={{ textDecoration: '-line-through' }}>{oldval}</td>
+                <td>{oldval}</td>
               </tr>
             );
           } else {
@@ -241,6 +247,77 @@ function TagsTable({ action }) {
                   <del>{oldval}</del>
                   {' → '}
                   <ins>{newval}</ins>
+                </td>
+              </tr>
+            );
+          }
+        })}
+      </tbody>
+    </table>
+  );
+}
+
+function RelationMembersTable({ action }) {
+  let allMembers;
+
+  if (action.type === 'create') {
+    allMembers = action.new.members;
+  } else {
+    allMembers = [...action.old.members, ...action.new.members];
+  }
+
+  let allMemberIds = new Set(allMembers.map(m => `${m.type}/${m.ref}`));
+  allMemberIds = [...allMemberIds].sort();
+
+  return (
+    <table>
+      <thead>
+        <tr>
+          <th>Member</th>
+          <th>Role</th>
+        </tr>
+      </thead>
+      <tbody>
+        {allMemberIds.map(id => {
+          const [type, ref] = id.split('/');
+          const oldMember = action.old?.members.find(
+            m => m.type === type && m.ref === +ref
+          );
+          const newMember = action.new?.members.find(
+            m => m.type === type && m.ref === +ref
+          );
+          const oldrole = oldMember?.role;
+          const newrole = newMember?.role;
+
+          if (oldrole === newrole) {
+            return (
+              <tr>
+                <td>{id}</td>
+                <td>{newrole}</td>
+              </tr>
+            );
+          } else if (oldrole === undefined) {
+            return (
+              <tr className="create">
+                <td>{id}</td>
+                <td>{newrole}</td>
+              </tr>
+            );
+          } else if (newrole === undefined) {
+            return (
+              <tr className="delete">
+                <td>{id}</td>
+                <td>{oldrole}</td>
+              </tr>
+            );
+          } else {
+            return (
+              <tr className="modify">
+                <td>{id}</td>
+                <td>
+                  <del>{oldrole}</del>
+                  {' → '}
+                  <ins>{newrole}</ins>
                 </td>
               </tr>
             );
