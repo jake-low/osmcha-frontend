@@ -198,7 +198,7 @@ class FiltersList extends React.PureComponent<void, propsType, *> {
         </Wrapper>
       );
     }
-  }
+  };
 
   render() {
     return (
@@ -207,16 +207,27 @@ class FiltersList extends React.PureComponent<void, propsType, *> {
           Basic
         </h2>
         {filtersData
-          .slice(0, 1)
+          .slice(0, 2)
           .map((f: Object, k) => this.renderFilters(f, k))}
         <Wrapper
           name="location"
           display="Location"
-          hasValue={this.props.filters.has('geometry') || this.props.filters.has('in_bbox')}
+          hasValue={
+            this.props.filters.has('geometry') ||
+            this.props.filters.has('in_bbox')
+          }
           handleFocus={this.props.handleFocus}
-          description={this.props.active === 'location' && "Filter changesets whose bounding box intersects a chosen area"}
+          description={
+            this.props.active === 'location' &&
+            'Filter changesets whose bounding box intersects a chosen area'
+          }
         >
-          <LocationSelect name="location" value="" placeholder="Type a place name" onChange={this.props.handleChange} />
+          <LocationSelect
+            name="location"
+            value=""
+            placeholder="Type a place name"
+            onChange={this.props.handleChange}
+          />
         </Wrapper>
         {filtersData
           .slice(2, 3)
