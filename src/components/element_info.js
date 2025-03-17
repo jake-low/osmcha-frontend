@@ -4,7 +4,6 @@ import { connect } from 'react-redux';
 import { flagFeature, unflagFeature } from '../network/changeset';
 import { Dropdown } from './dropdown';
 import { Button } from './button';
-import { API_URL } from '../config';
 import thumbsDown from '../assets/thumbs-down.svg';
 import type { RootStateType } from '../store';
 
@@ -120,7 +119,7 @@ function FlagButton({ changeset, featureId, token }) {
         .getIn(['properties', 'reviewed_features'])
         .find(e => e.get('id') === featureId.replace('/', '-')) !== undefined;
     setFlagged(isFlagged);
-  }, [changesetId, featureId]);
+  }, [changeset, changesetId, featureId]);
 
   let handleClick = async () => {
     if (flagged) {

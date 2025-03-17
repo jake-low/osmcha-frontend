@@ -35,6 +35,10 @@ import {
 type propsType = {|
   changesetId: number,
   currentChangeset: Map<string, any>,
+  showElements: Array<string>,
+  showActions: Array<string>,
+  setShowElements: (elements: Array<string>) => any,
+  setShowActions: (actions: Array<string>) => any,
   // The props below come from HOCs, they are not optional!
   // to circumvent the $Diff bug  ref: https://github.com/facebook/flow/issues/1601
   // have to make them optional for flow to not throw error.
@@ -87,7 +91,17 @@ export class _Changeset extends React.PureComponent<*, propsType, *> {
     }
   }
   showFloaters = () => {
-    const { changesetId, currentChangeset, bindingsState, data } = this.props;
+    const {
+      changesetId,
+      currentChangeset,
+      showElements,
+      showActions,
+      setShowElements,
+      setShowActions,
+      bindingsState,
+      data
+    } = this.props;
+
     if (!bindingsState || !data) return;
     const properties = currentChangeset.get('properties');
     return (
@@ -138,7 +152,11 @@ export class _Changeset extends React.PureComponent<*, propsType, *> {
             <Discussions
               changesetAuthor={currentChangeset.get('properties').get('user')}
               discussions={
-                this.props.osmInfo?.getIn(['metadata', 'changeset', 'comments']) ?? List()
+                this.props.osmInfo?.getIn([
+                  'metadata',
+                  'changeset',
+                  'comments'
+                ]) ?? List()
               }
               changesetIsHarmful={properties.get('harmful')}
               changesetId={changesetId}
@@ -188,7 +206,12 @@ export class _Changeset extends React.PureComponent<*, propsType, *> {
         )}
         {bindingsState.get(CHANGESET_DETAILS_MAP.label) && (
           <Box key={4} className="responsive-box round-tr round-br">
-            <MapOptions />
+            <MapOptions
+              showElements={showElements}
+              showActions={showActions}
+              setShowElements={setShowElements}
+              setShowActions={setShowActions}
+            />
           </Box>
         )}
       </CSSGroup>
@@ -231,7 +254,6 @@ export class _Changeset extends React.PureComponent<*, propsType, *> {
   render() {
     const { bindingsState, currentChangeset } = this.props;
     const features = currentChangeset.getIn(['properties', 'features']);
-    console.log("osmInfo", this.props.osmInfo);
     return (
       <div className="flex-child clip">
         <ControlLayout
@@ -246,7 +268,8 @@ export class _Changeset extends React.PureComponent<*, propsType, *> {
           features={features}
           bindingsState={bindingsState}
           discussions={
-            this.props.osmInfo?.getIn(['metadata', 'changeset', 'comments']) ?? List()
+            this.props.osmInfo?.getIn(['metadata', 'changeset', 'comments']) ??
+            List()
           }
         />
         <Floater style={{ marginTop: 5, marginLeft: 41 }}>

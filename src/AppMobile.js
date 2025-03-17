@@ -6,8 +6,6 @@ import { About } from './views/about';
 import { Stats } from './views/stats';
 import { Filters } from './views/filters';
 import { ChangesetsList } from './views/changesets_list';
-import { CMap } from './views/map';
-import { NavbarChangeset } from './views/navbar_changeset';
 import { NavbarSidebar } from './views/navbar_sidebar';
 import { Authorized } from './views/authorized';
 import { Modal } from './views/modal';
@@ -24,15 +22,6 @@ export const AppMobile = () => {
       <div className="col">
         <NavbarSidebar />
         <Route exact path="/" component={ChangesetsList} />
-        <Route path="/changesets" component={NavbarChangeset} />
-        <Route
-          path="/changesets"
-          // Need to use render to avoid unmounting of
-          // CMap Ref: https://reacttraining.com/react-router/web/api/Route/render-func
-          // CMap and views/changeset.js are clubbed so they can be
-          // loaded on demand in future.
-          render={() => <CMap className="z0 fixed bottom right" />}
-        />
         <Route path={'/changesets/:id'} component={Changeset} />
         <Route path="/about" component={About} />
         <Route path="/stats" component={Stats} />
@@ -43,7 +32,7 @@ export const AppMobile = () => {
         <Route path="/watchlist" component={Watchlist} />
         <Route path="/authorized" component={Authorized} />
         <Route exact path="/teams" component={MappingTeams} />
-        <Route path={'/teams/:id'} component={EditMappingTeam} />
+        <Route path="/teams/:id" component={EditMappingTeam} />
       </div>
       <Modal />
     </>

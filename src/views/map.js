@@ -23,7 +23,9 @@ class CMap extends React.PureComponent {
   props: {
     changesetId: number,
     className: string,
-    style: string
+    style: string,
+    showElements: Array<string>,
+    showActions: Array<string>
   };
 
   state = {
@@ -49,6 +51,8 @@ class CMap extends React.PureComponent {
     ) {
       this.setState({ selected: null, loading: true });
       this.initializeMap();
+    } else {
+      this.updateMap();
     }
   }
 
@@ -106,7 +110,9 @@ class CMap extends React.PureComponent {
     adiff.note =
       'Map data from <a href=https://openstreetmap.org/copyright>OpenStreetMap</a>';
     const adiffViewer = new MapLibreAugmentedDiffViewer(adiff, {
-      onClick: this.handleClick
+      onClick: this.handleClick,
+      showElements: this.props.showElements,
+      showActions: this.props.showActions
     });
 
     map.on('load', async () => {
@@ -126,6 +132,19 @@ class CMap extends React.PureComponent {
     });
 
     this.map = map;
+    this.adiffViewer = adiffViewer;
+  }
+
+  updateMap() {
+    if (this.state.loading || !this.map || !this.adiffViewer) return;
+
+    this.adiffViewer.options = {
+      onClick: this.handleClick,
+      showElements: this.props.showElements,
+      showActions: this.props.showActions
+    };
+
+    this.adiffViewer.updateStyle(this.map);
   }
 
   handleClick = (event, action) => {

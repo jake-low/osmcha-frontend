@@ -2,37 +2,32 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-// import { importChangesetMap } from '../../utils/cmap';
 import { updateStyle } from '../../store/map_controls_actions';
-import { Dropdown } from '../dropdown';
+
+// helper functions for adding/removing elements from an array when a
+// checkbox is toggled
+const add = (arr, elem) => {
+  let set = new Set(arr);
+  set.add(elem);
+  return [...set];
+};
+
+const remove = (arr, elem) => {
+  let set = new Set(arr);
+  set.delete(elem);
+  return [...set];
+};
+
+const toggle = (arr, elem) => {
+  return arr.indexOf(elem) === -1 ? add(arr, elem) : remove(arr, elem);
+};
 
 class MapOptions extends React.PureComponent {
-  state = {
-    actions: true,
-    type: true,
-    mapStyle: true,
-    user: true
-  };
   layerOptions = [
-    { label: 'Bing', value: 'bing', function: () => this.toggleBing() },
-    { label: 'OpenStreetMap Carto', value: 'carto', function: () => this.toggleOsm() }
+    { label: 'Bing', value: 'bing' },
+    { label: 'OpenStreetMap Carto', value: 'carto' }
   ];
-  getLayerDropdownDisplay = id => {
-    const filteredLayer = this.layerOptions.filter(l => l.value === id);
-    if (filteredLayer.length) return filteredLayer[0].label;
-    return 'Select a style';
-  };
-  onLayerChange = layer => {
-    if (layer && layer.length) {
-      layer[0].function();
-      this.props.updateStyle(layer[0].value);
-    }
-  };
-  onChange = () => {
-    // importChangesetMap('getMapInstance').then(
-    //   r => r && r() && r().filterLayers()
-    // );
-  };
+
   toggleBing = () => {
     const bingStyle = {
       version: 8,
@@ -59,10 +54,8 @@ class MapOptions extends React.PureComponent {
         }
       ]
     };
-    // importChangesetMap('getMapInstance').then(
-    //   r => r && r() && r().renderMap(bingStyle)
-    // );
   };
+
   toggleOsm = () => {
     const osmStyle = {
       version: 8,
@@ -89,11 +82,16 @@ class MapOptions extends React.PureComponent {
         }
       ]
     };
-    // importChangesetMap('getMapInstance').then(
-    //   r => r && r() && r().renderMap(osmStyle)
-    // );
   };
+
   render() {
+    const {
+      showElements,
+      showActions,
+      setShowElements,
+      setShowActions
+    } = this.props;
+
     return (
       <div className="px12 py6">
         <h2 className="txt-m txt-uppercase txt-bold mr6 mb3">Map Controls</h2>
@@ -105,10 +103,8 @@ class MapOptions extends React.PureComponent {
               <label>
                 <input
                   type="checkbox"
-                  value="added"
-                  defaultChecked="true"
-                  id="cmap-layer-selector-added"
-                  onChange={this.onChange}
+                  checked={showActions.includes('create')}
+                  onChange={() => setShowActions(toggle(showActions, 'create'))}
                 />
                 Added
               </label>
@@ -117,10 +113,8 @@ class MapOptions extends React.PureComponent {
               <label>
                 <input
                   type="checkbox"
-                  value="modified"
-                  defaultChecked="true"
-                  onChange={this.onChange}
-                  id="cmap-layer-selector-modified"
+                  checked={showActions.includes('modify')}
+                  onChange={() => setShowActions(toggle(showActions, 'modify'))}
                 />
                 Modified
               </label>
@@ -129,10 +123,8 @@ class MapOptions extends React.PureComponent {
               <label>
                 <input
                   type="checkbox"
-                  value="deleted"
-                  defaultChecked="true"
-                  onChange={this.onChange}
-                  id="cmap-layer-selector-deleted"
+                  checked={showActions.includes('delete')}
+                  onChange={() => setShowActions(toggle(showActions, 'delete'))}
                 />
                 Deleted
               </label>
@@ -146,10 +138,8 @@ class MapOptions extends React.PureComponent {
               <label>
                 <input
                   type="checkbox"
-                  value="nodes"
-                  defaultChecked="true"
-                  id="cmap-type-selector-nodes"
-                  onChange={this.onChange}
+                  checked={showElements.includes('node')}
+                  onChange={() => setShowElements(toggle(showElements, 'node'))}
                 />
                 Nodes
               </label>
@@ -158,10 +148,8 @@ class MapOptions extends React.PureComponent {
               <label>
                 <input
                   type="checkbox"
-                  value="ways"
-                  defaultChecked="true"
-                  id="cmap-type-selector-ways"
-                  onChange={this.onChange}
+                  checked={showElements.includes('way')}
+                  onChange={() => setShowElements(toggle(showElements, 'way'))}
                 />
                 Ways
               </label>
@@ -170,10 +158,10 @@ class MapOptions extends React.PureComponent {
               <label>
                 <input
                   type="checkbox"
-                  value="relations"
-                  defaultChecked="true"
-                  id="cmap-type-selector-relations"
-                  onChange={this.onChange}
+                  checked={showElements.includes('relation')}
+                  onChange={() =>
+                    setShowElements(toggle(showElements, 'relation'))
+                  }
                 />
                 Relations
               </label>
@@ -182,16 +170,11 @@ class MapOptions extends React.PureComponent {
         </section>
         <section className="cmap-map-style-section cmap-pb3">
           <h6 className="cmap-heading pointer txt-bold">Map style</h6>
-          <Dropdown
-            eventTypes={['click', 'touchend']}
-            value={this.props.style}
-            onAdd={() => {}}
-            onRemove={() => {}}
-            options={this.layerOptions}
-            onChange={this.onLayerChange}
-            display={this.getLayerDropdownDisplay(this.props.style)}
-            position="left"
-          />
+          <select>
+            {this.layerOptions.map(opt => (
+              <option value={opt.value}>{opt.label}</option>
+            ))}
+          </select>
         </section>
       </div>
     );

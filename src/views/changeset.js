@@ -5,6 +5,8 @@ import { Map, fromJS } from 'immutable';
 import Mousetrap from 'mousetrap';
 
 import { Changeset as ChangesetDumb } from '../components/changeset';
+import { CMap } from '../views/map';
+import { NavbarChangeset } from '../views/navbar_changeset';
 
 import { dispatchEvent } from '../utils/dispatch_event';
 
@@ -22,12 +24,36 @@ class Changeset extends React.PureComponent {
     token: string,
     applyFilters: (Map<string, *>) => mixed // base 0
   };
+
+  state = {
+    // map configuration state (set in the changeset info panel and used in the CMap view)
+    showElements: ['node', 'way', 'relation'],
+    showActions: ['create', 'modify', 'delete'],
+    basemapStyle: 'bing'
+  };
+
   componentDidMount() {
     Mousetrap.bind(FILTER_BY_USER.bindings, this.filterChangesetsByUser);
   }
+
+  componentDidUpdate(prevProps: Object) {
+    if (
+      this.props.token !== prevProps.token ||
+      this.props.changesetId !== prevProps.changesetId
+    ) {
+      // reset filters for element type and action type when switching
+      // to a new changeset
+      this.setState({
+        showElements: ['node', 'way', 'relation'],
+        showActions: ['create', 'modify', 'delete']
+      });
+    }
+  }
+
   componentWillUnmount() {
     FILTER_BY_USER.bindings.forEach(k => Mousetrap.unbind(k));
   }
+
   filterChangesetsByUser = () => {
     if (this.props.currentChangeset) {
       const userName = this.props.currentChangeset.getIn([
@@ -47,6 +73,7 @@ class Changeset extends React.PureComponent {
       );
     }
   };
+
   showChangeset = () => {
     const {
       loading,
@@ -75,14 +102,29 @@ class Changeset extends React.PureComponent {
         changesetId={changesetId}
         currentChangeset={currentChangeset}
         token={token}
+        showElements={this.state.showElements}
+        showActions={this.state.showActions}
+        setShowElements={showElements => this.setState({ showElements })}
+        setShowActions={showActions => this.setState({ showActions })}
       />
     );
   };
+
   render() {
     return (
-      <div className="absolute" style={{ top: 0, left: 0 }}>
-        <div className="absolute flex-parent flex-parent--column clip">
-          {this.showChangeset()}
+      <div className="flex-parent flex-parent--column h-full">
+        <NavbarChangeset />
+        <div className="flex-child flex-child--grow relative">
+          <CMap
+            className="z0 fixed bottom right"
+            showElements={this.state.showElements}
+            showActions={this.state.showActions}
+          />
+          <div className="absolute" style={{ top: 0, left: 0 }}>
+            <div className="absolute flex-parent flex-parent--column clip">
+              {this.showChangeset()}
+            </div>
+          </div>
         </div>
       </div>
     );
