@@ -19,6 +19,57 @@ export function selectFeature(id: number) {
   event.emit('selectFeature', 'node|way', id);
 }
 
+const BING_AERIAL_IMAGERY_STYLE = {
+  version: 8,
+  sources: {
+    bing: {
+      type: 'raster',
+      tiles: [
+        'https://ecn.t0.tiles.virtualearth.net/tiles/a{quadkey}.jpeg?g=587&mkt=en-gb&n=z',
+        'https://ecn.t1.tiles.virtualearth.net/tiles/a{quadkey}.jpeg?g=587&mkt=en-gb&n=z',
+        'https://ecn.t2.tiles.virtualearth.net/tiles/a{quadkey}.jpeg?g=587&mkt=en-gb&n=z',
+        'https://ecn.t3.tiles.virtualearth.net/tiles/a{quadkey}.jpeg?g=587&mkt=en-gb&n=z'
+      ],
+      tileSize: 256,
+      maxzoom: 20,
+      attribution: 'Imagery © Microsoft Corporation'
+    }
+  },
+  layers: [
+    {
+      id: 'imagery',
+      type: 'raster',
+      source: 'bing'
+    }
+  ]
+};
+
+const OPENSTREETMAP_CARTO_STYLE = {
+  version: 8,
+  sources: {
+    'osm-tiles': {
+      type: 'raster',
+      tiles: [
+        'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        'https://b.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png'
+      ],
+      tileSize: 256,
+      attribution:
+        '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }
+  },
+  layers: [
+    {
+      id: 'osm',
+      type: 'raster',
+      source: 'osm-tiles',
+      minzoom: 0,
+      maxzoom: 22
+    }
+  ]
+};
+
 class CMap extends React.PureComponent {
   props: {
     changesetId: number,
@@ -51,7 +102,11 @@ class CMap extends React.PureComponent {
     ) {
       this.setState({ selected: null, loading: true });
       this.initializeMap();
-    } else {
+    } else if (
+      this.props.style !== prevProps.style ||
+      this.props.showElements !== prevProps.showElements ||
+      this.props.showActions !== prevProps.showActions
+    ) {
       this.updateMap();
     }
   }
@@ -67,32 +122,15 @@ class CMap extends React.PureComponent {
       this.map.remove();
     }
 
+    let style = BING_AERIAL_IMAGERY_STYLE;
+
+    if (this.props.style === 'carto') {
+      style = OPENSTREETMAP_CARTO_STYLE;
+    }
+
     let map = new maplibre.Map({
       container,
-      style: {
-        version: 8,
-        sources: {
-          bing: {
-            type: 'raster',
-            tiles: [
-              'https://ecn.t0.tiles.virtualearth.net/tiles/a{quadkey}.jpeg?g=587&mkt=en-gb&n=z',
-              'https://ecn.t1.tiles.virtualearth.net/tiles/a{quadkey}.jpeg?g=587&mkt=en-gb&n=z',
-              'https://ecn.t2.tiles.virtualearth.net/tiles/a{quadkey}.jpeg?g=587&mkt=en-gb&n=z',
-              'https://ecn.t3.tiles.virtualearth.net/tiles/a{quadkey}.jpeg?g=587&mkt=en-gb&n=z'
-            ],
-            tileSize: 256,
-            maxzoom: 20,
-            attribution: 'Imagery © Microsoft Corporation'
-          }
-        },
-        layers: [
-          {
-            id: 'imagery',
-            type: 'raster',
-            source: 'bing'
-          }
-        ]
-      },
+      style,
       maxZoom: 22,
       hash: false,
       attributionControl: false // we're moving this to the other corner
@@ -138,19 +176,31 @@ class CMap extends React.PureComponent {
   updateMap() {
     if (this.state.loading || !this.map || !this.adiffViewer) return;
 
+    let style = BING_AERIAL_IMAGERY_STYLE;
+
+    if (this.props.style === 'carto') {
+      style = OPENSTREETMAP_CARTO_STYLE;
+    }
+
+    this.map.setStyle(style);
+
     this.adiffViewer.options = {
       onClick: this.handleClick,
       showElements: this.props.showElements,
       showActions: this.props.showActions
     };
 
-    this.adiffViewer.updateStyle(this.map);
+    this.adiffViewer.refresh();
   }
 
   handleClick = (event, action) => {
     console.log('handleClick()', action);
     this.setState({ selected: action });
   };
+
+  setHighlight = (type, id, highlighted) => {
+    this.adiffViewer.setHighlight(type, id, highlighted);
+  }
 
   render() {
     console.log(`CMap render with changesetId = ${this.props.changesetId}`);
@@ -172,7 +222,7 @@ class CMap extends React.PureComponent {
                 overflowY: 'auto'
               }}
             >
-              <ElementInfo action={this.state.selected} />
+              <ElementInfo action={this.state.selected} setHighlight={this.setHighlight} />
             </div>
           )}
           {this.state.loading && (

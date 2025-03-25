@@ -11,7 +11,7 @@ import type { RootStateType } from '../store';
  * Displays info about an element that was created/modified/deleted.
  * Shown when an element is selected on the changeset map.
  */
-function ElementInfo({ changeset, action, token }) {
+function ElementInfo({ changeset, action, token, setHighlight }) {
   let id = action.new.type + '/' + action.new.id;
   console.log('changeset', changeset);
 
@@ -35,7 +35,7 @@ function ElementInfo({ changeset, action, token }) {
       {action.new.type === 'relation' && (
         <React.Fragment>
           <hr />
-          <RelationMembersTable action={action} />
+          <RelationMembersTable action={action} setHighlight={setHighlight} />
         </React.Fragment>
       )}
     </div>
@@ -256,7 +256,7 @@ function TagsTable({ action }) {
   );
 }
 
-function RelationMembersTable({ action }) {
+function RelationMembersTable({ action, setHighlight }) {
   let allMembers;
 
   if (action.type === 'create') {
@@ -269,7 +269,7 @@ function RelationMembersTable({ action }) {
   allMemberIds = [...allMemberIds].sort();
 
   return (
-    <table>
+    <table className="member-table">
       <thead>
         <tr>
           <th>Member</th>
@@ -288,30 +288,35 @@ function RelationMembersTable({ action }) {
           const oldrole = oldMember?.role;
           const newrole = newMember?.role;
 
+          const onMouseEnter = () => setHighlight(type, +ref, true);
+          const onMouseLeave = () => setHighlight(type, +ref, false);
+
+          const interactions = { onMouseEnter, onMouseLeave };
+
           if (oldrole === newrole) {
             return (
-              <tr>
+              <tr {...interactions}>
                 <td>{id}</td>
                 <td>{newrole}</td>
               </tr>
             );
           } else if (oldrole === undefined) {
             return (
-              <tr className="create">
+              <tr className="create" {...interactions}>
                 <td>{id}</td>
                 <td>{newrole}</td>
               </tr>
             );
           } else if (newrole === undefined) {
             return (
-              <tr className="delete">
+              <tr className="delete" {...interactions}>
                 <td>{id}</td>
                 <td>{oldrole}</td>
               </tr>
             );
           } else {
             return (
-              <tr className="modify">
+              <tr className="modify" {...interactions}>
                 <td>{id}</td>
                 <td>
                   <del>{oldrole}</del>

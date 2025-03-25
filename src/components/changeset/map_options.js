@@ -24,65 +24,9 @@ const toggle = (arr, elem) => {
 
 class MapOptions extends React.PureComponent {
   layerOptions = [
-    { label: 'Bing', value: 'bing' },
+    { label: 'Bing aerial imagery', value: 'bing' },
     { label: 'OpenStreetMap Carto', value: 'carto' }
   ];
-
-  toggleBing = () => {
-    const bingStyle = {
-      version: 8,
-      sources: {
-        'bing-tiles': {
-          type: 'raster',
-          tiles: [
-            'https://ecn.t0.tiles.virtualearth.net/tiles/a{quadkey}.jpeg?g=587&mkt=en-gb&n=z',
-            'https://ecn.t1.tiles.virtualearth.net/tiles/a{quadkey}.jpeg?g=587&mkt=en-gb&n=z',
-            'https://ecn.t2.tiles.virtualearth.net/tiles/a{quadkey}.jpeg?g=587&mkt=en-gb&n=z',
-            'https://ecn.t3.tiles.virtualearth.net/tiles/a{quadkey}.jpeg?g=587&mkt=en-gb&n=z'
-          ],
-          attribution:
-            '© <a href="https://blog.openstreetmap.org/2010/11/30/microsoft-imagery-details">Microsoft Corporation</a>'
-        }
-      },
-      layers: [
-        {
-          id: 'bing',
-          type: 'raster',
-          source: 'bing-tiles',
-          minzoom: 0,
-          maxzoom: 22
-        }
-      ]
-    };
-  };
-
-  toggleOsm = () => {
-    const osmStyle = {
-      version: 8,
-      sources: {
-        'osm-tiles': {
-          type: 'raster',
-          tiles: [
-            'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png',
-            'https://b.tile.openstreetmap.org/{z}/{x}/{y}.png',
-            'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png'
-          ],
-          tileSize: 256,
-          attribution:
-            '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }
-      },
-      layers: [
-        {
-          id: 'osm',
-          type: 'raster',
-          source: 'osm-tiles',
-          minzoom: 0,
-          maxzoom: 22
-        }
-      ]
-    };
-  };
 
   render() {
     const {
@@ -170,7 +114,10 @@ class MapOptions extends React.PureComponent {
         </section>
         <section className="cmap-map-style-section cmap-pb3">
           <h6 className="cmap-heading pointer txt-bold">Map style</h6>
-          <select>
+          <select
+            value={this.props.style}
+            onChange={(e) => this.props.updateStyle(e.target.value)}
+          >
             {this.layerOptions.map(opt => (
               <option value={opt.value}>{opt.label}</option>
             ))}

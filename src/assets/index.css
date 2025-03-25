@@ -538,6 +538,10 @@ th {
   font-weight: bold;
 }
 
+.metadata-table td:not(:last-child) {
+  padding-right: 1ch;
+}
+
 .tag-table {
   text-indent: 3ch hanging;
 }
@@ -609,3 +613,10 @@ th {
   margin-right: 1ch;
 }
 
+.member-table tr {
+  cursor: pointer;
+}
+
+.member-table tr:hover {
+  font-weight: bold;
+}
