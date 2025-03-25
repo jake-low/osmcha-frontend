@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { Map, fromJS } from 'immutable';
 import Mousetrap from 'mousetrap';
 
-import { Changeset as ChangesetDumb } from '../components/changeset';
+import { Changeset as ChangesetOverlay } from '../components/changeset';
 import { CMap } from '../views/map';
 import { NavbarChangeset } from '../views/navbar_changeset';
 
@@ -14,6 +14,10 @@ import { applyFilters } from '../store/filters_actions';
 import { FILTER_BY_USER } from '../config/bindings';
 import type { RootStateType } from '../store';
 
+/**
+ * This is the main component for the changeset view.
+ * It displays the changeset details and the map.
+ */
 class Changeset extends React.PureComponent {
   props: {
     errorChangeset: ?Object, // error of the latest that changeset failed
@@ -26,11 +30,19 @@ class Changeset extends React.PureComponent {
   };
 
   state = {
+    // the currently selected element on the map; either null or an 'action' object
+    // from @osmcha/maplibre-adiff-viewer ({ type, old, new })
+    selected: null,
     // map configuration state (set in the changeset info panel and used in the CMap view)
     showElements: ['node', 'way', 'relation'],
     showActions: ['create', 'modify', 'delete'],
     basemapStyle: 'bing'
   };
+
+  // This ref is passed to CMap, which updates it with references to the MapLibre map
+  // and AdiffViewer instance. Other components can use this ref to imperatively update
+  // the map state.
+  mapRef = React.createRef();
 
   componentDidMount() {
     Mousetrap.bind(FILTER_BY_USER.bindings, this.filterChangesetsByUser);
@@ -98,7 +110,7 @@ class Changeset extends React.PureComponent {
       return null;
     }
     return (
-      <ChangesetDumb
+      <ChangesetOverlay
         changesetId={changesetId}
         currentChangeset={currentChangeset}
         token={token}
@@ -106,6 +118,8 @@ class Changeset extends React.PureComponent {
         showActions={this.state.showActions}
         setShowElements={showElements => this.setState({ showElements })}
         setShowActions={showActions => this.setState({ showActions })}
+        mapRef={this.mapRef}
+        selected={this.state.selected}
       />
     );
   };
@@ -116,15 +130,14 @@ class Changeset extends React.PureComponent {
         <NavbarChangeset />
         <div className="flex-child flex-child--grow relative">
           <CMap
+            mapRef={this.mapRef}
             className="z0 fixed bottom right"
             showElements={this.state.showElements}
             showActions={this.state.showActions}
+            setSelected={selected => this.setState({ selected })}
           />
-          <div className="absolute" style={{ top: 0, left: 0 }}>
-            <div className="absolute flex-parent flex-parent--column clip">
-              {this.showChangeset()}
-            </div>
-          </div>
+
+          {this.showChangeset()}
         </div>
       </div>
     );

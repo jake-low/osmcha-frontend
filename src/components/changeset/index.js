@@ -30,6 +30,7 @@ import {
   CHANGESET_DETAILS_DISCUSSIONS,
   CHANGESET_DETAILS_MAP
 } from '../../config/bindings';
+import ElementInfo from '../element_info';
 
 // | denote strict props
 type propsType = {|
@@ -39,6 +40,10 @@ type propsType = {|
   showActions: Array<string>,
   setShowElements: (elements: Array<string>) => any,
   setShowActions: (actions: Array<string>) => any,
+  mapRef: React.RefObject<{
+    map: maplibre.Map,
+    adiffViewer: MapLibreAugmentedDiffViewer
+  }>,
   // The props below come from HOCs, they are not optional!
   // to circumvent the $Diff bug  ref: https://github.com/facebook/flow/issues/1601
   // have to make them optional for flow to not throw error.
@@ -47,7 +52,11 @@ type propsType = {|
   exclusiveKeyToggle?: (label: string) => any
 |};
 
-// presentational component for view/changeset.js
+/**
+ * This is the UI overlay that appears on top of the map in the changeset view.
+ * It displays information about the changeset in the upper left, and may also display
+ * information about the currently selected element in the lower right.
+ */
 export class _Changeset extends React.PureComponent<*, propsType, *> {
   getUserDetailsPromise;
   getWhosThatPromise;
@@ -255,27 +264,56 @@ export class _Changeset extends React.PureComponent<*, propsType, *> {
     const { bindingsState, currentChangeset } = this.props;
     const features = currentChangeset.getIn(['properties', 'features']);
     return (
-      <div className="flex-child clip">
-        <ControlLayout
-          toggleDetails={this.toggleDetails}
-          toggleFeatures={this.toggleFeatures}
-          toggleOtherFeatures={this.toggleOtherFeatures}
-          toggleTags={this.toggleTags}
-          toggleGeometryChanges={this.toggleGeometryChanges}
-          toggleDiscussions={this.toggleDiscussions}
-          toggleUser={this.toggleUser}
-          toggleMapOptions={this.toggleMapOptions}
-          features={features}
-          bindingsState={bindingsState}
-          discussions={
-            this.props.osmInfo?.getIn(['metadata', 'changeset', 'comments']) ??
-            List()
-          }
-        />
-        <Floater style={{ marginTop: 5, marginLeft: 41 }}>
-          {this.showFloaters()}
-        </Floater>
-      </div>
+      <React.Fragment>
+        <div
+          className="absolute flex-parent flex-parent--column clip"
+          style={{ top: 0, left: 0 }}
+        >
+          <div className="flex-child clip">
+            <ControlLayout
+              toggleDetails={this.toggleDetails}
+              toggleFeatures={this.toggleFeatures}
+              toggleOtherFeatures={this.toggleOtherFeatures}
+              toggleTags={this.toggleTags}
+              toggleGeometryChanges={this.toggleGeometryChanges}
+              toggleDiscussions={this.toggleDiscussions}
+              toggleUser={this.toggleUser}
+              toggleMapOptions={this.toggleMapOptions}
+              features={features}
+              bindingsState={bindingsState}
+              discussions={
+                this.props.osmInfo?.getIn([
+                  'metadata',
+                  'changeset',
+                  'comments'
+                ]) ?? List()
+              }
+            />
+            <Floater style={{ marginTop: 5, marginLeft: 41 }}>
+              {this.showFloaters()}
+            </Floater>
+          </div>
+        </div>
+        {this.props.selected && (
+          <div
+            className="absolute bg-white px12 py6 z5 round"
+            style={{
+              bottom: 0,
+              right: 0,
+              margin: '10px',
+              minWidth: '400px',
+              maxWidth: '550px',
+              maxHeight: '60vh',
+              overflowY: 'auto'
+            }}
+          >
+            <ElementInfo
+              action={this.props.selected}
+              mapRef={this.props.mapRef}
+            />
+          </div>
+        )}
+      </React.Fragment>
     );
   }
 }

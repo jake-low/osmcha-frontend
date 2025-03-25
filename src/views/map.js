@@ -76,12 +76,15 @@ class CMap extends React.PureComponent {
     className: string,
     style: string,
     showElements: Array<string>,
-    showActions: Array<string>
+    showActions: Array<string>,
+    mapRef: React.RefObject<{
+      map: maplibre.Map,
+      adiffViewer: MapLibreAugmentedDiffViewer
+    }>
   };
 
   state = {
-    loading: true,
-    selected: null
+    loading: true
   };
 
   map = null;
@@ -92,6 +95,9 @@ class CMap extends React.PureComponent {
 
   componentWillUnmount() {
     event && event.emit('remove');
+    if (this.props.mapRef) {
+      this.props.mapRef.current = null;
+    }
   }
 
   componentDidUpdate(prevProps: Object) {
@@ -100,7 +106,7 @@ class CMap extends React.PureComponent {
       this.props.changesetId !== prevProps.changesetId ||
       !prevProps.changeset
     ) {
-      this.setState({ selected: null, loading: true });
+      this.setState({ loading: true });
       this.initializeMap();
     } else if (
       this.props.style !== prevProps.style ||
@@ -171,6 +177,15 @@ class CMap extends React.PureComponent {
 
     this.map = map;
     this.adiffViewer = adiffViewer;
+
+    // Store the map and adiffViewer in the ref passed from the parent component
+    // (this allows other components to imperatively update the map state)
+    if (this.props.mapRef) {
+      this.props.mapRef.current = {
+        map: this.map,
+        adiffViewer: this.adiffViewer
+      };
+    }
   }
 
   updateMap() {
@@ -195,12 +210,12 @@ class CMap extends React.PureComponent {
 
   handleClick = (event, action) => {
     console.log('handleClick()', action);
-    this.setState({ selected: action });
+    this.props.setSelected(action);
   };
 
   setHighlight = (type, id, highlighted) => {
     this.adiffViewer.setHighlight(type, id, highlighted);
-  }
+  };
 
   render() {
     console.log(`CMap render with changesetId = ${this.props.changesetId}`);
@@ -209,22 +224,6 @@ class CMap extends React.PureComponent {
       return (
         <React.Fragment>
           <div id="container" className="w-full h-full" />
-          {this.state.selected && (
-            <div
-              className="absolute bg-white px12 py6 z5 round"
-              style={{
-                bottom: 0,
-                right: 0,
-                margin: '10px',
-                minWidth: '400px',
-                maxWidth: '550px',
-                maxHeight: '60vh',
-                overflowY: 'auto'
-              }}
-            >
-              <ElementInfo action={this.state.selected} setHighlight={this.setHighlight} />
-            </div>
-          )}
           {this.state.loading && (
             <div
               className="absolute z0"

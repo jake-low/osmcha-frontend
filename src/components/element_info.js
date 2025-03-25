@@ -11,7 +11,7 @@ import type { RootStateType } from '../store';
  * Displays info about an element that was created/modified/deleted.
  * Shown when an element is selected on the changeset map.
  */
-function ElementInfo({ changeset, action, token, setHighlight }) {
+function ElementInfo({ changeset, action, token, mapRef }) {
   let id = action.new.type + '/' + action.new.id;
   console.log('changeset', changeset);
 
@@ -35,7 +35,7 @@ function ElementInfo({ changeset, action, token, setHighlight }) {
       {action.new.type === 'relation' && (
         <React.Fragment>
           <hr />
-          <RelationMembersTable action={action} setHighlight={setHighlight} />
+          <RelationMembersTable action={action} mapRef={mapRef} />
         </React.Fragment>
       )}
     </div>
@@ -256,7 +256,7 @@ function TagsTable({ action }) {
   );
 }
 
-function RelationMembersTable({ action, setHighlight }) {
+function RelationMembersTable({ action, mapRef }) {
   let allMembers;
 
   if (action.type === 'create') {
@@ -267,6 +267,10 @@ function RelationMembersTable({ action, setHighlight }) {
 
   let allMemberIds = new Set(allMembers.map(m => `${m.type}/${m.ref}`));
   allMemberIds = [...allMemberIds].sort();
+
+  const setHighlight = (type, id, highlighted) => {
+    mapRef?.current?.adiffViewer.setHighlight(type, id, highlighted);
+  };
 
   return (
     <table className="member-table">
