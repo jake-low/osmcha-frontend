@@ -1902,41 +1902,6 @@
   resolved "https://registry.yarnpkg.com/@leichtgewicht/ip-codec/-/ip-codec-2.0.5.tgz#4fc56c15c580b9adb7dc3c333a134e540b44bfb1"
   integrity sha512-Vo+PSpZG2/fmgmiNzYK9qWRh8h/CHrwD0mo1h1DzL4yzHNSfWYujGTYsWGreD000gcgmZ7K4Ys6Tx9TxtsKdDw==
 
-"@mapbox/extent@0.4.0":
-  version "0.4.0"
-  resolved "https://registry.npmjs.org/@mapbox/extent/-/extent-0.4.0.tgz"
-  integrity sha1-PlkfMuHww5gchkI597CsBuYQ+Kk=
-
-"@mapbox/geojson-area@^0.2.2":
-  version "0.2.2"
-  resolved "https://registry.npmjs.org/@mapbox/geojson-area/-/geojson-area-0.2.2.tgz"
-  integrity sha1-GNeBSqNr8j+7zDefjiaiKSfevxA=
-  dependencies:
-    wgs84 "0.0.0"
-
-"@mapbox/geojson-coords@0.0.1":
-  version "0.0.1"
-  resolved "https://registry.npmjs.org/@mapbox/geojson-coords/-/geojson-coords-0.0.1.tgz"
-  integrity sha512-cdMlqmDl1vzAl2E0XC2zIuqM74vdet0Dq2el49haJEVbGpC8se40j5UcsnBK/gsvZzrume30fon1u/aSYMXG4Q==
-  dependencies:
-    "@mapbox/geojson-normalize" "0.0.1"
-    geojson-flatten "^1.0.4"
-
-"@mapbox/geojson-extent@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.npmjs.org/@mapbox/geojson-extent/-/geojson-extent-1.0.0.tgz"
-  integrity sha512-OWW/Tw7OkKHoogXjQJNILjLd2d4JZzO/elc5Qr08VNwFSIPpSnJgyaEGO2xRPqNuWDLr4RocuqmC0FcQWPgeOA==
-  dependencies:
-    "@mapbox/extent" "0.4.0"
-    "@mapbox/geojson-coords" "0.0.1"
-    rw "~0.1.4"
-    traverse "~0.6.6"
-
-"@mapbox/geojson-normalize@0.0.1", "@mapbox/geojson-normalize@^0.0.1":
-  version "0.0.1"
-  resolved "https://registry.npmjs.org/@mapbox/geojson-normalize/-/geojson-normalize-0.0.1.tgz"
-  integrity sha1-HaHms6et060pkJsw9Dj2BYG3zYA=
-
 "@mapbox/geojson-rewind@^0.5.2":
   version "0.5.2"
   resolved "https://registry.yarnpkg.com/@mapbox/geojson-rewind/-/geojson-rewind-0.5.2.tgz#591a5d71a9cd1da1a0bf3420b3bea31b0fc7946a"
@@ -1949,19 +1914,6 @@
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/@mapbox/jsonlint-lines-primitives/-/jsonlint-lines-primitives-2.0.2.tgz#ce56e539f83552b58d10d672ea4d6fc9adc7b234"
   integrity sha512-rY0o9A5ECsTQRVhv7tL/OyDpGAoUB4tTvLiW1DSzQGq4bvTPhNw1VpSNjDJc5GFZ2XuyOtSWSVN05qOtcD71qQ==
-
-"@mapbox/mapbox-gl-draw@^1.3.0":
-  version "1.3.0"
-  resolved "https://registry.npmjs.org/@mapbox/mapbox-gl-draw/-/mapbox-gl-draw-1.3.0.tgz"
-  integrity sha512-B+KWK+dAgzLHMNyKVuuMRfjeSlQ77MhNLdfpQQpbp3pkhnrdmydDe3ixto1Ua78hktNut0WTrAaD8gYu4PVcjA==
-  dependencies:
-    "@mapbox/geojson-area" "^0.2.2"
-    "@mapbox/geojson-extent" "^1.0.0"
-    "@mapbox/geojson-normalize" "^0.0.1"
-    "@mapbox/point-geometry" "^0.1.0"
-    hat "0.0.3"
-    lodash.isequal "^4.5.0"
-    xtend "^4.0.2"
 
 "@mapbox/point-geometry@0.1.0", "@mapbox/point-geometry@^0.1.0", "@mapbox/point-geometry@~0.1.0":
   version "0.1.0"
@@ -2031,10 +1983,10 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@osmcha/maplibre-adiff-viewer@^1.2.0":
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/@osmcha/maplibre-adiff-viewer/-/maplibre-adiff-viewer-1.2.0.tgz#d29ef37c190d75ce569b3c9c4ec4445bd04b8ca5"
-  integrity sha512-LhuWy4ZiuJ04UiV1+7OCig+bc83jYYVDLHUFe05Ybxd6kWawh5Kz8LOYwEj12c88dECk8FZaUIo6jQVf5qafDw==
+"@osmcha/maplibre-adiff-viewer@^1.2.1":
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/@osmcha/maplibre-adiff-viewer/-/maplibre-adiff-viewer-1.2.1.tgz#a7eabb5f28e138ce6efe547e88e283649624fba2"
+  integrity sha512-DR6zRcUHbyvfSI+/C+HTtqxWv8ginzZ2/A0WVsG/rMd9cED9CdZ3jHTKj1agfHDQcDBdQq+Muy846TznNwPbXA==
   dependencies:
     "@turf/bbox" "^7.2.0"
     "@turf/bbox-polygon" "^7.2.0"
@@ -6916,14 +6868,6 @@ gensync@^1.0.0-beta.2:
   resolved "https://registry.yarnpkg.com/gensync/-/gensync-1.0.0-beta.2.tgz#32a6ee76c3d7f52d46b2b1ae5d93fea8580a25e0"
   integrity sha512-3hN7NaskYvMDLQY55gnW3NQ+mesEAepTqlg+VEbj7zzqEMBVNhzcGYYeqFo/TlYz6eQiFcp1HcsCZO+nGgS8zg==
 
-geojson-flatten@^1.0.4:
-  version "1.0.4"
-  resolved "https://registry.npmjs.org/geojson-flatten/-/geojson-flatten-1.0.4.tgz"
-  integrity sha512-PpscUXxO6dvvhZxtwuqiI5v+1C/IQYPJRMWoQeaF2oohJgfGYSHKVAe8L+yUqF34PH/hmq9JlwmO+juPw+95/Q==
-  dependencies:
-    get-stdin "^7.0.0"
-    minimist "^1.2.5"
-
 geojson-vt@^4.0.2:
   version "4.0.2"
   resolved "https://registry.yarnpkg.com/geojson-vt/-/geojson-vt-4.0.2.tgz#1162f6c7d61a0ba305b1030621e6e111f847828a"
@@ -6993,11 +6937,6 @@ get-stdin@^5.0.1:
   version "5.0.1"
   resolved "https://registry.npmjs.org/get-stdin/-/get-stdin-5.0.1.tgz"
   integrity sha1-Ei4WFZHiH/TFJTAwVpPyDmOTo5g=
-
-get-stdin@^7.0.0:
-  version "7.0.0"
-  resolved "https://registry.npmjs.org/get-stdin/-/get-stdin-7.0.0.tgz"
-  integrity sha512-zRKcywvrXlXsA0v0i9Io4KDRaAw7+a1ZpjRwl9Wox8PFlVCCHra7E9c4kqXCoCM9nR5tBkaTTZRBoCm60bFqTQ==
 
 get-stream@^3.0.0:
   version "3.0.0"
@@ -7366,11 +7305,6 @@ hasown@^2.0.0, hasown@^2.0.1, hasown@^2.0.2:
   integrity sha512-0hJU9SCPvmMzIBdZFqNPXWa6dqh7WdH0cII9y+CyS8rG3nL48Bclra9HmKhVVUHyPWNH5Y7xDwAB7bfgSjkUMQ==
   dependencies:
     function-bind "^1.1.2"
-
-hat@0.0.3:
-  version "0.0.3"
-  resolved "https://registry.npmjs.org/hat/-/hat-0.0.3.tgz"
-  integrity sha1-uwFKnmSzeIrtgAWRdBPU/z1QLYo=
 
 hawk@~6.0.2:
   version "6.0.2"
@@ -13094,11 +13028,6 @@ rw@^1.3.3:
   resolved "https://registry.yarnpkg.com/rw/-/rw-1.3.3.tgz#3f862dfa91ab766b14885ef4d01124bfda074fb4"
   integrity sha512-PdhdWy89SiZogBLaw42zdeqtRJ//zFd2PgQavcICDUgJT5oW10QCRKbJ6bg4r0/UY2M6BWd5tkxuGFRvCkgfHQ==
 
-rw@~0.1.4:
-  version "0.1.4"
-  resolved "https://registry.npmjs.org/rw/-/rw-0.1.4.tgz"
-  integrity sha1-SQPL2AJIrg7eaFv1j9I2p6mymj4=
-
 rx-lite-aggregates@^4.0.8:
   version "4.0.8"
   resolved "https://registry.npmjs.org/rx-lite-aggregates/-/rx-lite-aggregates-4.0.8.tgz"
@@ -14564,11 +14493,6 @@ tr46@^2.1.0:
   dependencies:
     punycode "^2.1.1"
 
-traverse@~0.6.6:
-  version "0.6.6"
-  resolved "https://registry.npmjs.org/traverse/-/traverse-0.6.6.tgz"
-  integrity sha1-y99WD9e5r2MlAv7UD5GMFX6pcTc=
-
 tryer@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/tryer/-/tryer-1.0.1.tgz#f2c85406800b9b0f74c9f7465b81eaad241252f8"
@@ -15160,11 +15084,6 @@ websocket-extensions@>=0.1.1:
   resolved "https://registry.npmjs.org/websocket-extensions/-/websocket-extensions-0.1.4.tgz"
   integrity sha512-OqedPIGOfsDlo31UNwYbCFMSaO9m9G/0faIHj5/dZFDMFqPTcx6UwqyOy3COEaEOg/9VsGIpdqn62W5KhoKSpg==
 
-wgs84@0.0.0:
-  version "0.0.0"
-  resolved "https://registry.npmjs.org/wgs84/-/wgs84-0.0.0.tgz"
-  integrity sha1-NP3FVZF7blfPKigu0ENxDASc3HY=
-
 whatwg-encoding@^1.0.1, whatwg-encoding@^1.0.3, whatwg-encoding@^1.0.5:
   version "1.0.5"
   resolved "https://registry.npmjs.org/whatwg-encoding/-/whatwg-encoding-1.0.5.tgz"
@@ -15589,11 +15508,6 @@ xmlchars@^2.2.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/xmlchars/-/xmlchars-2.2.0.tgz#060fe1bcb7f9c76fe2a17db86a9bc3ab894210cb"
   integrity sha512-JZnDKK8B0RCDw84FNdDAIpZK+JuJw+s7Lz8nksI7SIuU3UXJJslUthsi+uWBUYOwPFwW7W7PRLRfUKpxjtjFCw==
-
-xtend@^4.0.2:
-  version "4.0.2"
-  resolved "https://registry.npmjs.org/xtend/-/xtend-4.0.2.tgz"
-  integrity sha512-LKYU1iAXJXUgAXn9URjiu+MWhyUXHsvfp7mcuYm9dSUKK0/CjtrUwFAxD82/mCWbtLsGjFIad0wIsod4zrTAEQ==
 
 y18n@^3.2.1:
   version "3.2.2"

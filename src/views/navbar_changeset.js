@@ -22,7 +22,6 @@ import {
   OPEN_IN_ACHAVI,
   OPEN_IN_HDYC
 } from '../config/bindings';
-import { API_URL } from '../config/index';
 
 import {
   handleChangesetModifyTag,

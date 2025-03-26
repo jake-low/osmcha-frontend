@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import deepEqual from 'deep-equal';
 
 import type { RootStateType } from '../store';
-import { getFeatures, FeatureListItem } from './tag_changes';
+import { FeatureListItem } from './tag_changes';
 import { Loading } from '../loading';
 import { OpenAll } from '../open_all';
 import { ExpandItemIcon } from '../expand_item_icon';

@@ -287,7 +287,6 @@ export class _Changeset extends React.PureComponent<*, propsType, *> {
   /// Given an OSM Element type (node/way/relation) and ID number,
   /// zoom the map to show that element, and select it in the overlay.
   zoomToAndSelect = (type: string, id: number) => {
-    console.log('zoomToAndSelect', type, id);
     let { map, adiffViewer } = this.props.mapRef.current;
 
     // find the feature(s) in the geojson that represent this element

@@ -17,7 +17,6 @@ class SignInButton extends React.PureComponent {
         'https%3A%2F%2Fosmcha.org',
         encodeURI('http://127.0.0.1')
       );
-      console.log(url);
       window.location.assign(url);
     });
   };

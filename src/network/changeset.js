@@ -2,7 +2,7 @@
 import adiffParser from '@osmcha/osm-adiff-parser';
 import { parse, subSeconds } from 'date-fns';
 
-import { API_URL, appVersion } from '../config';
+import { API_URL } from '../config';
 import { adiffServiceUrl, apiOSM, overpassBase } from '../config/constants.js';
 import { handleErrors } from './aoi';
 

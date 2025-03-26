@@ -76,11 +76,9 @@ export class LocationSelect extends React.PureComponent {
     draw.start();
 
     draw.on('finish', (id, context) => {
-      console.log(id, context);
       const snapshot = draw.getSnapshot();
       const feature = snapshot.find(f => f.id === id);
       const bounds = bbox(feature); // even though the user drew a box, 'feature' is a Polygon
-      console.log(bounds);
       const wsen = bounds.map(v => v.toFixed(4)).join(',');
 
       this.props.onChange('geometry', undefined);
@@ -153,14 +151,10 @@ export class LocationSelect extends React.PureComponent {
         .then(json => {
           if (!Array.isArray(json)) return cb(null, { options: [] });
 
-          console.log(json);
-
           const data = json.map(d => ({
             label: d.display_name,
             value: d.geojson
           }));
-
-          console.log(data);
 
           return cb(null, { options: data });
         })
@@ -184,7 +178,6 @@ export class LocationSelect extends React.PureComponent {
   };
 
   onChangeLocal = (data: ?Array<Object>) => {
-    console.log(data);
     if (data) {
       this.draw.clear();
       const tolerance = area(data.value) / 10 ** 6 < 1000 ? 0.01 : 0.1;
@@ -220,7 +213,6 @@ export class LocationSelect extends React.PureComponent {
   };
 
   render() {
-    console.log(this.props);
     return (
       <div>
         <div className="grid grid--gut12">

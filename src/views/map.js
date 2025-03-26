@@ -153,14 +153,9 @@ class CMap extends React.PureComponent {
       this.setState({ loading: false });
 
       if (adiffViewer) {
-        console.log(adiffViewer.geojson);
-        console.log(adiffViewer.bounds());
         adiffViewer.addTo(map);
         map.jumpTo(
-          map.cameraForBounds(adiffViewer.bounds(), {
-            padding: 50,
-            maxZoom: 18
-          })
+          map.cameraForBounds(adiffViewer.bounds(), { padding: 50, maxZoom: 18 })
         );
       }
     });
@@ -199,7 +194,6 @@ class CMap extends React.PureComponent {
   }
 
   handleClick = (event, action) => {
-    console.log('handleClick()', action);
     // Update the selected action in the parent component
     // (so we can render it in the element info panel)
     this.props.setSelected(action);
@@ -219,8 +213,6 @@ class CMap extends React.PureComponent {
   };
 
   render() {
-    console.log(`CMap render with changesetId = ${this.props.changesetId}`);
-    console.log(this.props.style);
     if (this.props.token) {
       return (
         <React.Fragment>
