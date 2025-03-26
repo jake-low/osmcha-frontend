@@ -3,14 +3,14 @@ import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 
 import type { RootStateType } from '../store';
-import { getFeatures, FeatureListItem } from './tag_changes';
+import { FeatureListItem } from './tag_changes';
 import { Loading } from '../loading';
 import { OpenAll } from '../open_all';
 import { ExpandItemIcon } from '../expand_item_icon';
 
 function otherChangesFromActions(actions) {
   const finalReport = new Map();
-  
+
   for (const actionType of ['create', 'delete']) {
     finalReport.set(
       actionType,
@@ -19,18 +19,24 @@ function otherChangesFromActions(actions) {
         .map(action => ({ id: action.new.id, type: action.new.type }))
     );
   }
-  
+
   finalReport.set(
     'modify',
     actions
       .filter(action => action.type === 'modify' && action.type === 'relation')
       .map(action => ({ id: action.new.id, type: action.new.type }))
   );
-  
+
   return finalReport;
 }
 
-const ActionItem = ({ opened, tag, features }) => {
+const ActionItem = ({
+  opened,
+  tag,
+  features,
+  setHighlight,
+  zoomToAndSelect
+}) => {
   const [isOpen, setIsOpen] = useState(opened);
   const titles = {
     create: 'Created',
@@ -43,7 +49,7 @@ const ActionItem = ({ opened, tag, features }) => {
   return (
     <div>
       <button
-        className="pointer"
+        className="cursor-pointer"
         tabIndex="0"
         aria-pressed={isOpen}
         onClick={() => setIsOpen(!isOpen)}
@@ -56,7 +62,16 @@ const ActionItem = ({ opened, tag, features }) => {
       </button>
       <ul className="cmap-vlist" style={{ display: isOpen ? 'block' : 'none' }}>
         {features.map((item, k) => (
-          <FeatureListItem id={item.id} type={item.type} key={k} />
+          <FeatureListItem
+            id={item.id}
+            type={item.type}
+            key={k}
+            onMouseEnter={() => setHighlight(item.type, item.id, true)}
+            onMouseLeave={() => setHighlight(item.type, item.id, false)}
+            onFocus={() => setHighlight(item.type, item.id, true)}
+            onBlur={() => setHighlight(item.type, item.id, false)}
+            onClick={() => zoomToAndSelect(item.type, item.id)}
+          />
         ))}
       </ul>
     </div>
@@ -65,10 +80,17 @@ const ActionItem = ({ opened, tag, features }) => {
 
 type propsType = {|
   changesetId: string,
-  changes: Object
+  changes: Object,
+  setHighlight: (type: string, id: number, isHighlighted: boolean) => void,
+  zoomToAndSelect: (type: string, id: number) => void
 |};
 
-const OtherFeaturesComponent = ({ changesetId, changes }: propsType) => {
+const OtherFeaturesComponent = ({
+  changesetId,
+  changes,
+  setHighlight,
+  zoomToAndSelect
+}: propsType) => {
   const [changeReport, setChangeReport] = useState([]);
   const [openAll, setOpenAll] = useState(false);
 
@@ -104,6 +126,8 @@ const OtherFeaturesComponent = ({ changesetId, changes }: propsType) => {
               tag={change[0]}
               features={change[1]}
               opened={openAll}
+              setHighlight={setHighlight}
+              zoomToAndSelect={zoomToAndSelect}
             />
           ))
         ) : (

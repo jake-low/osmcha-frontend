@@ -528,6 +528,11 @@ th {
   margin: 0.25em 0;
 }
 
+.element-info h2 a {
+  /* assembly.js removes link styles, so add them back here */
+  text-decoration: underline;
+}
+
 .element-info table {
   font-family: monospace;
   line-height: 1.1;

@@ -33,9 +33,9 @@ class Changeset extends React.PureComponent {
     // the currently selected element on the map; either null or an 'action' object
     // from @osmcha/maplibre-adiff-viewer ({ type, old, new })
     selected: null,
-    // map configuration state (set in the changeset info panel and used in the CMap view)
+    // map configuration state (set in the map options panel and used in the CMap view)
     showElements: ['node', 'way', 'relation'],
-    showActions: ['create', 'modify', 'delete'],
+    showActions: ['create', 'modify', 'delete', 'noop'],
     basemapStyle: 'bing'
   };
 
@@ -57,7 +57,7 @@ class Changeset extends React.PureComponent {
       // to a new changeset
       this.setState({
         showElements: ['node', 'way', 'relation'],
-        showActions: ['create', 'modify', 'delete']
+        showActions: ['create', 'modify', 'delete', 'noop']
       });
     }
   }
@@ -120,6 +120,7 @@ class Changeset extends React.PureComponent {
         setShowActions={showActions => this.setState({ showActions })}
         mapRef={this.mapRef}
         selected={this.state.selected}
+        setSelected={selected => this.setState({ selected })}
       />
     );
   };

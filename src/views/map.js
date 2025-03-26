@@ -6,18 +6,9 @@ import { MapLibreAugmentedDiffViewer } from '@osmcha/maplibre-adiff-viewer';
 
 import { Loading } from '../components/loading';
 import { SignIn } from '../components/sign_in';
-import ElementInfo from '../components/element_info';
 import { updateStyle } from '../store/map_controls_actions';
 import { modal } from '../store/modal_actions';
 import type { RootStateType } from '../store';
-
-let event;
-
-export function selectFeature(id: number) {
-  // FIXME used by other components, but currently doesn't work
-  if (!id || !event) return;
-  event.emit('selectFeature', 'node|way', id);
-}
 
 const BING_AERIAL_IMAGERY_STYLE = {
   version: 8,
@@ -94,7 +85,6 @@ class CMap extends React.PureComponent {
   }
 
   componentWillUnmount() {
-    event && event.emit('remove');
     if (this.props.mapRef) {
       this.props.mapRef.current = null;
     }
@@ -210,7 +200,18 @@ class CMap extends React.PureComponent {
 
   handleClick = (event, action) => {
     console.log('handleClick()', action);
+    // Update the selected action in the parent component
+    // (so we can render it in the element info panel)
     this.props.setSelected(action);
+
+    // Update the selection state on the map
+    // (highlighting/unhighlighting the geometry of the selected element)
+    if (action) {
+      let element = action.new ?? action.old;
+      this.adiffViewer.select(element.type, element.id);
+    } else {
+      this.adiffViewer.deselect();
+    }
   };
 
   setHighlight = (type, id, highlighted) => {

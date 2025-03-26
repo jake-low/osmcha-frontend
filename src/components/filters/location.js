@@ -16,7 +16,6 @@ import area from '@turf/area';
 import bbox from '@turf/bbox';
 import simplify from '@turf/simplify';
 import truncate from '@turf/truncate';
-import MapboxDraw from '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw';
 
 import { nominatimSearch } from '../../network/nominatim';
 

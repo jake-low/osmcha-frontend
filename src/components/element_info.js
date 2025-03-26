@@ -11,18 +11,32 @@ import type { RootStateType } from '../store';
  * Displays info about an element that was created/modified/deleted.
  * Shown when an element is selected on the changeset map.
  */
-function ElementInfo({ changeset, action, token, mapRef }) {
+function ElementInfo({ changeset, action, token, setHighlight }) {
   let id = action.new.type + '/' + action.new.id;
-  console.log('changeset', changeset);
 
   if (!changeset) {
     return null;
+  }
+
+  let actionPhrase: string;
+
+  if (action.type === 'create') {
+    actionPhrase = 'created';
+  } else if (action.type === 'modify') {
+    // NOTE: adiffs sometimes contain 'modify' actions that are actually no-ops;
+    // in this case the old and new versions are the same
+    actionPhrase =
+      action.old.version === action.new.version ? 'not changed' : 'modified';
+  } else if (action.type === 'delete') {
+    actionPhrase = 'deleted';
   }
 
   return (
     <div className="element-info">
       <h2>
         <a href={`https://www.openstreetmap.org/${id}`}>{id}</a>
+        {' was '}
+        {actionPhrase}
       </h2>
       <menu>
         <HistoryDropdown id={id} />
@@ -35,7 +49,7 @@ function ElementInfo({ changeset, action, token, mapRef }) {
       {action.new.type === 'relation' && (
         <React.Fragment>
           <hr />
-          <RelationMembersTable action={action} mapRef={mapRef} />
+          <RelationMembersTable action={action} setHighlight={setHighlight} />
         </React.Fragment>
       )}
     </div>
@@ -256,7 +270,7 @@ function TagsTable({ action }) {
   );
 }
 
-function RelationMembersTable({ action, mapRef }) {
+function RelationMembersTable({ action, setHighlight }) {
   let allMembers;
 
   if (action.type === 'create') {
@@ -267,10 +281,6 @@ function RelationMembersTable({ action, mapRef }) {
 
   let allMemberIds = new Set(allMembers.map(m => `${m.type}/${m.ref}`));
   allMemberIds = [...allMemberIds].sort();
-
-  const setHighlight = (type, id, highlighted) => {
-    mapRef?.current?.adiffViewer.setHighlight(type, id, highlighted);
-  };
 
   return (
     <table className="member-table">
@@ -294,7 +304,6 @@ function RelationMembersTable({ action, mapRef }) {
 
           const onMouseEnter = () => setHighlight(type, +ref, true);
           const onMouseLeave = () => setHighlight(type, +ref, false);
-
           const interactions = { onMouseEnter, onMouseLeave };
 
           if (oldrole === newrole) {

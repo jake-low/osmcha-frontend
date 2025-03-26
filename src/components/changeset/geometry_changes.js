@@ -13,27 +13,36 @@ function geometryChangesFromActions(actions) {
   const finalReport = new Map();
 
   let nodes = actions
-    .filter(action => 
-      action.type === 'modify'
-        && action.new.type == 'node'
-        && (action.new.lon !== action.old.lon || action.new.lat !== action.old.lat)
+    .filter(
+      action =>
+        action.type === 'modify' &&
+        action.new.type == 'node' &&
+        (action.new.lon !== action.old.lon || action.new.lat !== action.old.lat)
     )
     .map(action => action.new.id);
 
   let ways = actions
     .filter(
-      action => action.type === 'modify' && action.new.type === 'way' &&
+      action =>
+        action.type === 'modify' &&
+        action.new.type === 'way' &&
         !deepEqual(action.old.nodes, action.new.nodes)
     )
     .map(action => action.new.id);
 
   finalReport.set('node', nodes);
   finalReport.set('way', ways);
-  
+
   return finalReport;
 }
 
-const GeometryChangesItem = ({ elementType, elementIds, opened }) => {
+const GeometryChangesItem = ({
+  elementType,
+  elementIds,
+  opened,
+  setHighlight,
+  zoomToAndSelect
+}) => {
   const titles = { node: 'Nodes', way: 'Ways', relation: 'Relations' };
   const [isOpen, setIsOpen] = useState(opened);
 
@@ -42,7 +51,7 @@ const GeometryChangesItem = ({ elementType, elementIds, opened }) => {
   return (
     <div>
       <button
-        className="pointer"
+        className="cursor-pointer"
         tabIndex="0"
         aria-pressed={isOpen}
         onClick={() => setIsOpen(!isOpen)}
@@ -54,7 +63,17 @@ const GeometryChangesItem = ({ elementType, elementIds, opened }) => {
         </strong>
       </button>
       <ul className="cmap-vlist" style={{ display: isOpen ? 'block' : 'none' }}>
-        {elementIds.map(id => <FeatureListItem id={id} />)}
+        {elementIds.map(id => (
+          <FeatureListItem
+            type={elementType}
+            id={id}
+            onMouseEnter={() => setHighlight(elementType, id, true)}
+            onMouseLeave={() => setHighlight(elementType, id, false)}
+            onFocus={() => setHighlight(elementType, id, true)}
+            onBlur={() => setHighlight(elementType, id, false)}
+            onClick={() => zoomToAndSelect(elementType, id)}
+          />
+        ))}
       </ul>
     </div>
   );
@@ -62,10 +81,17 @@ const GeometryChangesItem = ({ elementType, elementIds, opened }) => {
 
 type propsType = {|
   changesetId: string,
-  changes: Object
+  changes: Object,
+  setHighlight: (type: string, id: number, isHighlighted: boolean) => void,
+  zoomToAndSelect: (type: string, id: number) => void
 |};
 
-const GeometryChangesComponent = ({ changesetId, changes }: propsType) => {
+const GeometryChangesComponent = ({
+  changesetId,
+  changes,
+  setHighlight,
+  zoomToAndSelect
+}: propsType) => {
   const [changeReport, setChangeReport] = useState([]);
   const [openAll, setOpenAll] = useState(false);
 
@@ -73,7 +99,7 @@ const GeometryChangesComponent = ({ changesetId, changes }: propsType) => {
     const newChangeReport = [];
     if (changes && changes.get(changesetId)) {
       const adiff = changes.get(changesetId)['adiff'];
-      
+
       const processed = geometryChangesFromActions(adiff.actions);
       processed.forEach((featureIDs, tag) =>
         newChangeReport.push([tag, featureIDs])
@@ -101,6 +127,8 @@ const GeometryChangesComponent = ({ changesetId, changes }: propsType) => {
               elementType={elementType}
               elementIds={elementIds}
               opened={openAll}
+              setHighlight={setHighlight}
+              zoomToAndSelect={zoomToAndSelect}
             />
           ))
         ) : (
